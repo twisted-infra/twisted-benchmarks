@@ -3,7 +3,6 @@ from __future__ import division
 
 from twisted.python.log import err
 from twisted.internet import reactor
-from twisted.internet.threads import deferToThread
 from twisted.internet.defer import Deferred
 
 
@@ -21,12 +20,10 @@ class Client(object):
 
 
     def _request(self):
-        d = deferToThread(lambda: None)
-        d.addCallback(self._continue)
-        d.addErrback(self._stop)
+        self._reactor.callLater(0.0, self._continue)
 
 
-    def _continue(self, ignored):
+    def _continue(self):
         self._requestCount += 1
         self._request()
 
@@ -43,7 +40,7 @@ class Client(object):
 
 
 def report(requestCount, duration):
-    print '%s req/sec (%s thread calls in %s seconds)' % (
+    print '%s req/sec (%s iterations in %s seconds)' % (
         requestCount / duration, requestCount, duration)
 
 
