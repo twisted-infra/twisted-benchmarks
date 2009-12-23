@@ -25,6 +25,7 @@ from twisted.web.static import Data
 from twisted.web.resource import Resource
 from twisted.web.client import ResponseDone, Agent
 
+from benchlib import Client
 
 
 class BodyConsumer(Protocol):
@@ -39,20 +40,11 @@ class BodyConsumer(Protocol):
 
 
 
-class Client(object):
-    _requestCount = 0
-
+class Client(Client):
     def __init__(self, reactor, portNumber, agent):
         self._requestLocation = 'http://127.0.0.1:%d/' % (portNumber,)
-        self._reactor = reactor
         self._agent = agent
-
-
-    def run(self, duration):
-        self._reactor.callLater(duration, self._stop, None)
-        self._request()
-        self._finished = Deferred()
-        return self._finished
+        super(Client, self).__init__(reactor)
 
 
     def _request(self):
@@ -68,21 +60,6 @@ class Client(object):
         return finished
 
 
-    def _continue(self, ignored):
-        self._requestCount += 1
-        self._request()
-
-
-    def _stop(self, reason):
-        if self._finished is not None:
-            finished = self._finished
-            self._finished = None
-            if reason is not None:
-                finished.errback(reason)
-            else:
-                finished.callback(self._requestCount)
-
-
 
 def report(requestCount, duration):
     print '%s req/sec (%s requests in %s seconds)' % (
@@ -92,13 +69,15 @@ def report(requestCount, duration):
 
 def main():
     duration = 5
+    concurrency = 10
+
     root = Resource()
     root.putChild('', Data("Hello, world", "text/plain"))
     port = reactor.listenTCP(
         0, Site(root), backlog=128, interface='127.0.0.1')
     agent = Agent(reactor)
     client = Client(reactor, port.getHost().port, agent)
-    d = client.run(duration)
+    d = client.run(concurrency, duration)
     d.addCallbacks(report, err, callbackArgs=(duration,))
     d.addCallback(lambda ign: reactor.stop())
     reactor.run()
