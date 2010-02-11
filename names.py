@@ -3,12 +3,11 @@ from __future__ import division
 
 from twisted.python.log import err
 from twisted.internet.defer import Deferred
-from twisted.internet import reactor
 from twisted.names.dns import DNSDatagramProtocol
 from twisted.names.server import DNSServerFactory
 from twisted.names import hosts, client
 
-from benchlib import Client
+from benchlib import Client, driver
 
 
 class Client(Client):
@@ -30,7 +29,7 @@ def report(requestCount, duration):
 
 
 
-def main():
+def main(reactor):
     duration = 5
     concurrency = 10
 
@@ -39,9 +38,8 @@ def main():
     client = Client(reactor, port.getHost().port)
     d = client.run(concurrency, duration)
     d.addCallbacks(report, err, callbackArgs=(duration,))
-    d.addCallback(lambda ign: reactor.stop())
-    reactor.run()
+    return d
 
 
 if __name__ == '__main__':
-    main()
+    driver(main)

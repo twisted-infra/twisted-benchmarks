@@ -25,7 +25,7 @@ from twisted.web.static import Data
 from twisted.web.resource import Resource
 from twisted.web.client import ResponseDone, Agent
 
-from benchlib import Client
+from benchlib import Client, driver
 
 
 class BodyConsumer(Protocol):
@@ -67,7 +67,7 @@ def report(requestCount, duration):
 
 
 
-def main():
+def main(reactor):
     duration = 5
     concurrency = 10
 
@@ -79,10 +79,9 @@ def main():
     client = Client(reactor, port.getHost().port, agent)
     d = client.run(concurrency, duration)
     d.addCallbacks(report, err, callbackArgs=(duration,))
-    d.addCallback(lambda ign: reactor.stop())
-    reactor.run()
+    return d
 
 
 
 if __name__ == '__main__':
-    main()
+    driver(main)

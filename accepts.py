@@ -5,9 +5,8 @@ from twisted.python.log import err
 from twisted.internet.protocol import ServerFactory, ClientFactory, Protocol
 from twisted.internet.error import ConnectionClosed
 from twisted.internet.defer import Deferred
-from twisted.internet import reactor
 
-from benchlib import Client
+from benchlib import Client, driver
 
 
 class Client(Client):
@@ -45,7 +44,7 @@ class CloseConnection(Protocol):
 
 
 
-def main():
+def main(reactor):
     duration = 5
     concurrency = 50
 
@@ -56,10 +55,9 @@ def main():
     client = Client(reactor, port.getHost().port)
     d = client.run(concurrency, duration)
     d.addCallbacks(report, err, callbackArgs=(duration,))
-    d.addCallback(lambda ign: reactor.stop())
-    reactor.run()
+    return d
 
 
 
 if __name__ == '__main__':
-    main()
+    driver(main)

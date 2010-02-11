@@ -28,3 +28,10 @@ class Client(object):
                 finished.errback(reason)
             else:
                 finished.callback(self._requestCount)
+
+
+def driver(f):
+    from twisted.internet import reactor
+    d = f(reactor)
+    reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
+    reactor.run()
