@@ -35,3 +35,16 @@ def driver(f):
     d = f(reactor)
     reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
     reactor.run()
+
+
+def multidriver(*f):
+    from twisted.internet import reactor
+    jobs = iter(f)
+    def work():
+        for job in jobs:
+            d = job(reactor)
+            d.addCallback(lambda ignored: work())
+            return
+        reactor.stop()
+    reactor.callWhenRunning(work)
+    reactor.run()
