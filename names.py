@@ -23,24 +23,18 @@ class Client(Client):
 
 
 
-def report(requestCount, duration):
-    print '%s req/sec (%s requests in %s seconds)' % (
-        requestCount / duration, requestCount, duration)
 
-
-
-def main(reactor, iterations=1):
-    duration = 5 * iterations
+def main(reactor, duration):
     concurrency = 10
 
     controller = DNSServerFactory([hosts.Resolver()])
     port = reactor.listenUDP(0, DNSDatagramProtocol(controller))
     client = Client(reactor, port.getHost().port)
     d = client.run(concurrency, duration)
-    d.addCallbacks(report, err, callbackArgs=(duration,))
     return d
 
 
 if __name__ == '__main__':
     import sys
-    driver(main, sys.argv)
+    import names
+    driver(names.main, sys.argv)

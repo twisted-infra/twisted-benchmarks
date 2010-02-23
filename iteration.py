@@ -13,23 +13,16 @@ class Client(Client):
 
 
 
-def report(requestCount, duration):
-    print '%s iter/sec (%s iterations in %s seconds)' % (
-        requestCount / duration, requestCount, duration)
-
-
-
-def main(reactor, iterations=1):
-    duration = 5 * iterations
+def main(reactor, duration):
     concurrency = 10
 
     client = Client(reactor)
     d = client.run(concurrency, duration)
-    d.addCallbacks(report, err, callbackArgs=(duration,))
     return d
 
 
 
 if __name__ == '__main__':
     import sys
-    driver(main, sys.argv)
+    import iteration
+    driver(iteration.main, sys.argv)
