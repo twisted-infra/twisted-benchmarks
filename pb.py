@@ -53,9 +53,9 @@ def report(requestCount, duration):
 
 
 
-def main(reactor):
+def main(reactor, iterations):
     concurrency = 15
-    duration = 5
+    duration = 5 * iterations
 
     server = PBServerFactory(BenchRoot())
     port = reactor.listenTCP(0, server)
@@ -66,4 +66,5 @@ def main(reactor):
 
 
 if __name__ == '__main__':
-    driver(main)
+    import sys
+    driver(main, sys.argv)

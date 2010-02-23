@@ -44,8 +44,8 @@ class CloseConnection(Protocol):
 
 
 
-def main(reactor):
-    duration = 5
+def main(reactor, iterations):
+    duration = 5 * iterations
     concurrency = 50
 
     factory = ServerFactory()
@@ -60,4 +60,5 @@ def main(reactor):
 
 
 if __name__ == '__main__':
-    driver(main)
+    import sys
+    driver(main, sys.argv)

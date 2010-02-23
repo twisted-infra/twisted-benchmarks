@@ -1,5 +1,7 @@
 
+import sys
 from twisted.internet.defer import Deferred
+from twisted.internet import reactor
 
 class Client(object):
     def __init__(self, reactor):
@@ -29,20 +31,29 @@ class Client(object):
             else:
                 finished.callback(self._requestCount)
 
+def setup_driver(f, argv, reactor):
+    from twisted.python.usage import Options
 
-def driver(f):
-    from twisted.internet import reactor
-    d = f(reactor)
+    class BenchmarkOptions(Options):
+        optParameters = [
+            ('iterations', 'n', 1, 'number of iterations', int),
+        ]
+
+    options = BenchmarkOptions()
+    options.parseOptions(argv[1:])
+    d = f(reactor, options['iterations'])
+    return d
+
+def driver(f, argv):
+    d = setup_driver(f, argv, reactor)
     reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
     reactor.run()
 
-
 def multidriver(*f):
-    from twisted.internet import reactor
     jobs = iter(f)
     def work():
         for job in jobs:
-            d = job(reactor)
+            d = setup_driver(job, sys.argv, reactor)
             d.addCallback(lambda ignored: work())
             return
         reactor.stop()
