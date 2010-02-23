@@ -14,7 +14,7 @@ class Client(Client):
 
 
 def report(requestCount, duration):
-    print '%s req/sec (%s iterations in %s seconds)' % (
+    print '%s iter/sec (%s iterations in %s seconds)' % (
         requestCount / duration, requestCount, duration)
 
 
