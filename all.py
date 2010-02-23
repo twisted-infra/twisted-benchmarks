@@ -1,8 +1,8 @@
 
 from benchlib import multidriver
 
-import accepts, iteration, names, threads, web
+import accepts, tcp, iteration, names, threads, web, pb
 
 if __name__ == '__main__':
     multidriver(
-        accepts.main, iteration.main, names.main, threads.main, web.main)
+        accepts.main, tcp.main, iteration.main, names.main, threads.main, web.main, pb.main)
