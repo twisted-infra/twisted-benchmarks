@@ -52,6 +52,8 @@ class Client(object):
 
 
     def _stop(self):
+        self.stopProducing()
+        self._client.transport.unregisterProducer()
         self._finish(self._client.count)
 
 
@@ -74,15 +76,8 @@ class Client(object):
         self._finish(reason)
 
 
-
-def report(bytes, duration):
-    print '%0.4f MB/s (%s bytes in %s seconds)' % (
-        bytes / duration / 1024 / 1024, bytes, duration)
-
-
  
-def main(reactor):
-    duration = 5
+def main(reactor, duration):
     chunkSize = 16384
 
     server = ServerFactory()
@@ -90,9 +85,10 @@ def main(reactor):
     serverPort = reactor.listenTCP(0, server)
     client = Client(reactor, serverPort.getHost().port)
     d = client.run(duration, chunkSize)
-    d.addCallbacks(report, err, callbackArgs=(duration,))
     return d
 
 
 if __name__ == '__main__':
-    driver(main)
+    import sys
+    import tcp
+    driver(tcp.main, sys.argv)

@@ -61,14 +61,7 @@ class Client(Client):
 
 
 
-def report(requestCount, duration):
-    print '%s req/sec (%s requests in %s seconds)' % (
-        requestCount / duration, requestCount, duration)
-
-
-
-def main(reactor):
-    duration = 5
+def main(reactor, duration):
     concurrency = 10
 
     root = Resource()
@@ -78,10 +71,11 @@ def main(reactor):
     agent = Agent(reactor)
     client = Client(reactor, port.getHost().port, agent)
     d = client.run(concurrency, duration)
-    d.addCallbacks(report, err, callbackArgs=(duration,))
     return d
 
 
 
 if __name__ == '__main__':
-    driver(main)
+    import sys
+    import web
+    driver(web.main, sys.argv)

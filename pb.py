@@ -46,24 +46,17 @@ class Client(Client):
         d.addErrback(self._stop)
 
 
-
-def report(requestCount, duration):
-    print '%s requests/second (%s requests in %s seconds)' % (
-        requestCount / duration, requestCount, duration)
-
-
-
-def main(reactor):
+def main(reactor, duration):
     concurrency = 15
-    duration = 5
 
     server = PBServerFactory(BenchRoot())
     port = reactor.listenTCP(0, server)
     client = Client(reactor, port.getHost().port)
     d = client.run(concurrency, duration)
-    d.addCallbacks(report, err, callbackArgs=(duration,))
     return d
 
 
 if __name__ == '__main__':
-    driver(main)
+    import sys
+    import pb
+    driver(pb.main, sys.argv)

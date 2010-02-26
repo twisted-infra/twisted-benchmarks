@@ -31,21 +31,13 @@ class Client(Client):
         reason.trap(ConnectionClosed)
 
 
-
-def report(acceptCount, duration):
-    print '%s accepts/sec (%s connections in %s seconds)' % (
-        acceptCount / duration, acceptCount, duration)
-
-
-
 class CloseConnection(Protocol):
     def makeConnection(self, transport):
         transport.loseConnection()
 
 
 
-def main(reactor):
-    duration = 5
+def main(reactor, duration):
     concurrency = 50
 
     factory = ServerFactory()
@@ -54,10 +46,11 @@ def main(reactor):
 
     client = Client(reactor, port.getHost().port)
     d = client.run(concurrency, duration)
-    d.addCallbacks(report, err, callbackArgs=(duration,))
     return d
 
 
 
 if __name__ == '__main__':
-    driver(main)
+    import sys
+    import accepts
+    driver(accepts.main, sys.argv)
