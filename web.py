@@ -11,8 +11,6 @@ effect on system-wide performance and makes consecutive runs of the
 benchmark vary wildly in their results.
 """
 
-from __future__ import division
-
 from twisted.internet.protocol import Protocol
 from twisted.internet.defer import Deferred
 from twisted.web.server import Site

@@ -1,6 +1,4 @@
 
-from __future__ import division
-
 from benchlib import Client, driver
 
 

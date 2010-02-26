@@ -1,6 +1,4 @@
 
-from __future__ import division
-
 from twisted.internet.threads import deferToThread
 
 from benchlib import Client, driver

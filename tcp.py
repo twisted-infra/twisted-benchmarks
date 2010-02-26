@@ -7,8 +7,6 @@ The size of the string passed to each write call may play a significant
 factor in the performance of this benchmark.
 """
 
-from __future__ import division
-
 from twisted.internet.defer import Deferred
 from twisted.internet.protocol import ServerFactory, ClientCreator, Protocol
 from twisted.protocols.wire import Echo

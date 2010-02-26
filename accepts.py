@@ -1,6 +1,4 @@
 
-from __future__ import division
-
 from twisted.internet.protocol import ServerFactory, ClientFactory, Protocol
 from twisted.internet.error import ConnectionClosed
 from twisted.internet.defer import Deferred
