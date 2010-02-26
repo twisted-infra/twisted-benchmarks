@@ -9,7 +9,6 @@ factor in the performance of this benchmark.
 
 from __future__ import division
 
-from twisted.python.log import err
 from twisted.internet.defer import Deferred
 from twisted.internet.protocol import ServerFactory, ClientCreator, Protocol
 from twisted.protocols.wire import Echo

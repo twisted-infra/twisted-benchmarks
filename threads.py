@@ -1,9 +1,7 @@
 
 from __future__ import division
 
-from twisted.python.log import err
 from twisted.internet.threads import deferToThread
-from twisted.internet.defer import Deferred
 
 from benchlib import Client, driver
 

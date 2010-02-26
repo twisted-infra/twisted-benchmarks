@@ -6,7 +6,6 @@ Benchmark for Twisted Spread.
 from __future__ import division
 
 from twisted.spread.pb import PBServerFactory, PBClientFactory, Root
-from twisted.python.log import err
 
 from benchlib import Client, driver
 

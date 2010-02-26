@@ -13,12 +13,7 @@ benchmark vary wildly in their results.
 
 from __future__ import division
 
-from urlparse import urlparse
-
-from twisted.python.log import err
-from twisted.python.failure import Failure
-from twisted.internet import reactor
-from twisted.internet.protocol import Protocol, ClientFactory
+from twisted.internet.protocol import Protocol
 from twisted.internet.defer import Deferred
 from twisted.web.server import Site
 from twisted.web.static import Data
