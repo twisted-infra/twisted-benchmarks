@@ -66,6 +66,11 @@ def main(reactor, duration):
     agent = Agent(reactor)
     client = Client(reactor, port.getHost().port, agent)
     d = client.run(concurrency, duration)
+    def cleanup(passthrough):
+        d = port.stopListening()
+        d.addCallback(lambda ignored: passthrough)
+        return d
+    d.addBoth(cleanup)
     return d
 
 
