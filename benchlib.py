@@ -48,6 +48,7 @@ def setup_driver(f, argv, reactor):
         optParameters = [
             ('iterations', 'n', 1, 'number of iterations', int),
             ('duration', 'd', 5, 'duration of each iteration', int),
+            ('warmup', 'w', 0, 'number of warmup iterations', int),
         ]
 
     options = BenchmarkOptions()
@@ -62,7 +63,10 @@ def setup_driver(f, argv, reactor):
             d.callback(None)
         else:
             next = f(reactor, duration)
-            next.addCallback(benchmark_report, duration, f.__module__)
+            if options['warmup']:
+                options['warmup'] -= 1
+            else:
+                next.addCallback(benchmark_report, duration, f.__module__)
             next.addCallbacks(work, d.errback)
     work()
     return d
