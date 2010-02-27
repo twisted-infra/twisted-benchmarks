@@ -56,19 +56,17 @@ def setup_driver(f, argv, reactor):
     duration = options['duration']
     jobs = [f] * options['iterations']
     d = Deferred()
-    def work(_=None):
+    def work(res, counter):
         try:
             f = jobs.pop()
         except IndexError:
             d.callback(None)
         else:
             next = f(reactor, duration)
-            if options['warmup']:
-                options['warmup'] -= 1
-            else:
+            if counter <= 0:
                 next.addCallback(benchmark_report, duration, f.__module__)
-            next.addCallbacks(work, d.errback)
-    work()
+            next.addCallbacks(work, d.errback, (counter - 1,))
+    work(None, options['warmup'])
     return d
 
 def driver(f, argv):
