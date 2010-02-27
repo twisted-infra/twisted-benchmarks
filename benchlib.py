@@ -47,7 +47,7 @@ def setup_driver(f, argv, reactor):
     class BenchmarkOptions(Options):
         optParameters = [
             ('iterations', 'n', 1, 'number of iterations', int),
-            ('duration', 'd', 5, 'duration of each iteration', int),
+            ('duration', 'd', 5, 'duration of each iteration', float),
             ('warmup', 'w', 0, 'number of warmup iterations', int),
         ]
 
