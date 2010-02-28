@@ -1,6 +1,4 @@
 
-from __future__ import division
-
 from twisted.names.dns import DNSDatagramProtocol
 from twisted.names.server import DNSServerFactory
 from twisted.names import hosts, client

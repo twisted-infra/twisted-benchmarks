@@ -1,8 +1,12 @@
 
+from __future__ import division
+
 import sys
-from twisted.internet.defer import Deferred
-from twisted.internet import reactor
+
 from twisted.python import log
+from twisted.internet.defer import Deferred
+from twisted.application.app import ReactorSelectionMixin
+
 
 class Client(object):
     def __init__(self, reactor):
@@ -30,6 +34,8 @@ class Client(object):
             else:
                 finished.callback(self._requestCount)
 
+
+
 PRINT_TEMPL = ('%(stats)s %(name)s/sec (%(count)s %(name)s '
               'in %(duration)s seconds)')
 
@@ -41,10 +47,12 @@ def benchmark_report(acceptCount, duration, name):
         'duration' : duration
         }
 
+
+
 def setup_driver(f, argv, reactor):
     from twisted.python.usage import Options
 
-    class BenchmarkOptions(Options):
+    class BenchmarkOptions(Options, ReactorSelectionMixin):
         optParameters = [
             ('iterations', 'n', 1, 'number of iterations', int),
             ('duration', 'd', 5, 'duration of each iteration', float),
@@ -69,13 +77,19 @@ def setup_driver(f, argv, reactor):
     work(None, options['warmup'])
     return d
 
+
+
 def driver(f, argv):
+    from twisted.internet import reactor
     d = setup_driver(f, argv, reactor)
     d.addErrback(log.err)
     reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
     reactor.run()
 
+
+
 def multidriver(*f):
+    from twisted.internet import reactor
     jobs = iter(f)
     def work():
         for job in jobs:
