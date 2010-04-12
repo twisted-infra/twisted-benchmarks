@@ -7,8 +7,9 @@ from benchlib import Client, driver
 
 
 class Client(Client):
-    def __init__(self, reactor, portNumber):
+    def __init__(self, reactor, address, portNumber):
         super(Client, self).__init__(reactor)
+        self._address = address
         self._portNumber = portNumber
         self._factory = ClientFactory()
 
@@ -19,7 +20,7 @@ class Client(Client):
         factory.protocol = Protocol
         factory.clientConnectionLost = factory.clientConnectionFailed = lambda connector, reason: finished.errback(reason)
         finished.addErrback(self._filterFinished)
-        self._reactor.connectTCP('127.0.0.1', self._portNumber, factory)
+        self._reactor.connectTCP(self._address, self._portNumber, factory, bindAddress=(self._address, 0))
         finished.addCallback(self._continue)
         finished.addErrback(self._stop)
 
@@ -33,15 +34,19 @@ class CloseConnection(Protocol):
         transport.loseConnection()
 
 
-
+interface = 0
 def main(reactor, duration):
+    global interface
     concurrency = 50
 
     factory = ServerFactory()
     factory.protocol = CloseConnection
-    port = reactor.listenTCP(0, factory)
 
-    client = Client(reactor, port.getHost().port)
+    interface += 1
+    interface %= 255
+    port = reactor.listenTCP(0, factory, interface='127.0.0.%d' % (interface,))
+
+    client = Client(reactor, port.getHost().host, port.getHost().port)
     d = client.run(concurrency, duration)
     return d
 
