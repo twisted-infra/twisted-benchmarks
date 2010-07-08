@@ -34,8 +34,8 @@ class BodyConsumer(Protocol):
 
 
 class Client(Client):
-    def __init__(self, reactor, portNumber, agent):
-        self._requestLocation = 'http://127.0.0.1:%d/' % (portNumber,)
+    def __init__(self, reactor, host, portNumber, agent):
+        self._requestLocation = 'http://%s:%d/' % (host, portNumber,)
         self._agent = agent
         super(Client, self).__init__(reactor)
 
@@ -54,15 +54,20 @@ class Client(Client):
 
 
 
+interface = 0
 def main(reactor, duration):
+    global interface
     concurrency = 10
 
     root = Resource()
     root.putChild('', Data("Hello, world", "text/plain"))
+
+    interface += 1
+    interface %= 255
     port = reactor.listenTCP(
-        0, Site(root), backlog=128, interface='127.0.0.1')
+        0, Site(root), backlog=128, interface='127.0.0.%d' % (interface,))
     agent = Agent(reactor)
-    client = Client(reactor, port.getHost().port, agent)
+    client = Client(reactor, port.getHost().host, port.getHost().port, agent)
     d = client.run(concurrency, duration)
     def cleanup(passthrough):
         d = port.stopListening()
