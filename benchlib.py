@@ -6,6 +6,16 @@ import sys
 from twisted.python import log
 from twisted.internet.defer import Deferred
 from twisted.application.app import ReactorSelectionMixin
+from twisted.python.usage import Options
+
+
+class BenchmarkOptions(Options, ReactorSelectionMixin):
+    optParameters = [
+        ('iterations', 'n', 1, 'number of iterations', int),
+        ('duration', 'd', 5, 'duration of each iteration', float),
+        ('warmup', 'w', 0, 'number of warmup iterations', int),
+    ]
+
 
 
 class Client(object):
@@ -50,19 +60,14 @@ def benchmark_report(acceptCount, duration, name):
 
 
 def setup_driver(f, argv, reactor, reporter):
-    from twisted.python.usage import Options
+    return perform_benchmark(
+        reactor,
+        options['duration'], options['iterations'], options['warmup'],
+        f, reporter)
 
-    class BenchmarkOptions(Options, ReactorSelectionMixin):
-        optParameters = [
-            ('iterations', 'n', 1, 'number of iterations', int),
-            ('duration', 'd', 5, 'duration of each iteration', float),
-            ('warmup', 'w', 0, 'number of warmup iterations', int),
-        ]
 
-    options = BenchmarkOptions()
-    options.parseOptions(argv[1:])
-    duration = options['duration']
-    jobs = [f] * options['iterations']
+def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
+    jobs = [f] * iterations
     d = Deferred()
     def work(res, counter):
         try:
@@ -74,7 +79,7 @@ def setup_driver(f, argv, reactor, reporter):
             if counter <= 0:
                 next.addCallback(reporter, duration, f.__module__)
             next.addCallbacks(work, d.errback, (counter - 1,))
-    work(None, options['warmup'])
+    work(None, warmup)
     return d
 
 
@@ -83,18 +88,33 @@ class Driver(object):
 
     def driver(self, f, argv):
         from twisted.internet import reactor
-        d = setup_driver(f, argv, reactor, benchmark_report)
+
+        options = BenchmarkOptions()
+        options.parseOptions(argv[1:])
+
+        d = perform_benchmark(reactor, options['duration'], options['iterations'], options['warmup'], f, benchmark_report)
         d.addErrback(log.err)
         reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
         reactor.run()
 
 
     def multidriver(self, *f):
+        options = BenchmarkOptions()
+        options.parseOptions(sys.argv[1:])
+
+        self.run_jobs(f, duration, iterations, warmup)
+
+
+    def run_jobs(self, f, duration, iterations, warmup):
         from twisted.internet import reactor
+
         jobs = iter(f)
         def work():
             for job in jobs:
-                d = setup_driver(job, sys.argv, reactor, self.benchmark_report)
+                d = perform_benchmark(
+                    reactor,
+                    duration, iterations, warmup,
+                    job, self.benchmark_report)
                 d.addCallback(lambda ignored: work())
                 return
             reactor.stop()

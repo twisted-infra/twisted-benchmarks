@@ -3,57 +3,94 @@
 Evaluate one or more benchmarks and upload the results to a Speedcenter server.
 """
 
+from __future__ import division
+
+from sys import argv
 from os import uname
 from sys import executable
 from datetime import datetime
+from urllib import urlopen, urlencode
 
 import pysvn
 
 import twisted
+from twisted.python.filepath import FilePath
+from twisted.python.usage import UsageError
 
 from all import allBenchmarks
-from benchlib import Driver
+from benchlib import BenchmarkOptions, Driver
+
+
+class SpeedcenterOptions(BenchmarkOptions):
+    optParameters = [
+        ('url', None, None, 'Location of Speedcenter to which to upload results.'),
+        ]
+
+    def postOptions(self):
+        if not self['url']:
+            raise UsageError("The Speedcenter URL must be provided.")
+
 
 
 class SpeedcenterDriver(Driver):
     def benchmark_report(self, acceptCount, duration, name):
-        self.results.append((acceptCount, duration, name))
+        print name, acceptCount, duration
+        self.results.setdefault(name, []).append((acceptCount, duration))
 
 
 
 def reportEnvironment():
-    version = twisted.version.short().split('r', 1)[1]
+    revision = twisted.version.short().split('r', 1)[1]
 
     client = pysvn.Client()
-    [entry] = client.log(wc, pysvn.Revision(pysvn.opt_revision_kind.number, revision), limit=1)
-    date = str(datetime.datetime.fromtimestamp(entry['date']))
+    [entry] = client.log(
+        FilePath(twisted.__file__).parent().path,
+        pysvn.Revision(pysvn.opt_revision_kind.number, int(revision)),
+        limit=1)
+    date = str(datetime.fromtimestamp(entry['date']))
 
     return {
         'project': 'Twisted',
         'executable': executable,
         'environment': uname()[1],
-        'commitid': version,
+        'commitid': revision,
         'revision_date': date,
-
-        'benchmark': None,
-        'result_value': None,
-        'result_date': None,
-        'std_dev': None,
-        'min': None,
-        'max': None,
+        'result_date': str(datetime.now()),
         }
 
 
 
 def main():
+    options = SpeedcenterOptions()
+    try:
+        options.parseOptions(argv[1:])
+    except UsageError, e:
+        raise SystemExit(str(e))
+
     driver = SpeedcenterDriver()
-    driver.results = []
-    driver.multidriver(*allBenchmarks)
+    driver.results = {}
+    driver.run_jobs(
+        allBenchmarks,
+        options['duration'], options['iterations'], options['warmup'])
 
     environment = reportEnvironment()
 
-    for (acceptCount, duration, name) in driver.results:
+    for (name, results) in sorted(driver.results.items()):
+        rates = [count / duration for (count, duration) in results]
+        totalCount = sum([count for (count, duration) in results])
+        totalDuration = sum([duration for (count, duration) in results])
+
         stats = environment.copy()
         stats['benchmark'] = name
-        stats['result_value'] = acceptCount / duration
-        stats['result_date'] = datetime.datetime.now(),
+        stats['result_value'] = totalCount / totalDuration
+        stats['min'] = min(rates)
+        stats['max'] = max(rates)
+
+        # Please excuse me.
+        fObj = urlopen(options['url'], urlencode(stats))
+        print name, fObj.read()
+        fObj.close()
+
+
+if __name__ == '__main__':
+    main()
