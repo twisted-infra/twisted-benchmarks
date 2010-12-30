@@ -75,10 +75,14 @@ def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
         except IndexError:
             d.callback(None)
         else:
-            next = f(reactor, duration)
-            if counter <= 0:
-                next.addCallback(reporter, duration, f.__module__)
-            next.addCallbacks(work, d.errback, (counter - 1,))
+            try:
+                next = f(reactor, duration)
+            except:
+                d.errback()
+            else:
+                if counter <= 0:
+                    next.addCallback(reporter, duration, f.__module__)
+                next.addCallbacks(work, d.errback, (counter - 1,))
     work(None, warmup)
     return d
 
