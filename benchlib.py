@@ -49,7 +49,7 @@ def benchmark_report(acceptCount, duration, name):
 
 
 
-def setup_driver(f, argv, reactor):
+def setup_driver(f, argv, reactor, reporter):
     from twisted.python.usage import Options
 
     class BenchmarkOptions(Options, ReactorSelectionMixin):
@@ -72,30 +72,38 @@ def setup_driver(f, argv, reactor):
         else:
             next = f(reactor, duration)
             if counter <= 0:
-                next.addCallback(benchmark_report, duration, f.__module__)
+                next.addCallback(reporter, duration, f.__module__)
             next.addCallbacks(work, d.errback, (counter - 1,))
     work(None, options['warmup'])
     return d
 
 
+class Driver(object):
+    benchmark_report = staticmethod(benchmark_report)
 
-def driver(f, argv):
-    from twisted.internet import reactor
-    d = setup_driver(f, argv, reactor)
-    d.addErrback(log.err)
-    reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
-    reactor.run()
+    def driver(self, f, argv):
+        from twisted.internet import reactor
+        d = setup_driver(f, argv, reactor, benchmark_report)
+        d.addErrback(log.err)
+        reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
+        reactor.run()
+
+
+    def multidriver(self, *f):
+        from twisted.internet import reactor
+        jobs = iter(f)
+        def work():
+            for job in jobs:
+                d = setup_driver(job, sys.argv, reactor, self.benchmark_report)
+                d.addCallback(lambda ignored: work())
+                return
+            reactor.stop()
+        reactor.callWhenRunning(work)
+        reactor.run()
 
 
 
-def multidriver(*f):
-    from twisted.internet import reactor
-    jobs = iter(f)
-    def work():
-        for job in jobs:
-            d = setup_driver(job, sys.argv, reactor)
-            d.addCallback(lambda ignored: work())
-            return
-        reactor.stop()
-    reactor.callWhenRunning(work)
-    reactor.run()
+_driver = Driver()
+driver = _driver.driver
+multidriver = _driver.multidriver
+del _driver
