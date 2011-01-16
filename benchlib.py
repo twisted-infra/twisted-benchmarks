@@ -5,6 +5,7 @@ import sys
 
 from twisted.python import log
 from twisted.internet.defer import Deferred
+from twisted.internet.task import cooperate
 from twisted.application.app import ReactorSelectionMixin
 from twisted.python.usage import Options
 
@@ -96,33 +97,37 @@ class Driver(object):
         options = BenchmarkOptions()
         options.parseOptions(argv[1:])
 
-        d = perform_benchmark(reactor, options['duration'], options['iterations'], options['warmup'], f, benchmark_report)
+        d = perform_benchmark(
+            reactor,
+            options['duration'], options['iterations'], options['warmup'],
+            f, benchmark_report)
         d.addErrback(log.err)
         reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
         reactor.run()
 
 
-    def multidriver(self, *f):
+    def multidriver(self, f):
         options = BenchmarkOptions()
         options.parseOptions(sys.argv[1:])
-
-        self.run_jobs(f, duration, iterations, warmup)
+        self.run_jobs(
+            f, options['duration'], options['iterations'], options['warmup'])
 
 
     def run_jobs(self, f, duration, iterations, warmup):
         from twisted.internet import reactor
 
-        jobs = iter(f)
-        def work():
-            for job in jobs:
-                d = perform_benchmark(
-                    reactor,
-                    duration, iterations, warmup,
-                    job, self.benchmark_report)
-                d.addCallback(lambda ignored: work())
-                return
-            reactor.stop()
-        reactor.callWhenRunning(work)
+        def work(job):
+            return perform_benchmark(
+                reactor, duration, iterations, warmup,
+                job, self.benchmark_report)
+
+        def go():
+            task = cooperate(work(job) for job in f)
+            d = task.whenDone()
+            d.addErrback(log.err)
+            d.addCallback(lambda ignored: reactor.stop())
+
+        reactor.callWhenRunning(go)
         reactor.run()
 
 
