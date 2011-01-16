@@ -5,7 +5,7 @@ Evaluate one or more benchmarks and upload the results to a Speedcenter server.
 
 from __future__ import division
 
-from sys import argv
+from sys import argv, stdout
 from os import uname
 from sys import executable
 from datetime import datetime
@@ -35,6 +35,7 @@ class SpeedcenterOptions(BenchmarkOptions):
 class SpeedcenterDriver(Driver):
     def benchmark_report(self, acceptCount, duration, name):
         print name, acceptCount, duration
+        stdout.flush()
         self.results.setdefault(name, []).append((acceptCount, duration))
 
 
