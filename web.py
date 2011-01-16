@@ -1,14 +1,14 @@
 
 """
-This benchmark runs a trivial Twisted Web server and client and makes as
-many requests as it can in a fixed period of time.
+This benchmark runs a trivial Twisted Web server and client and makes as many
+requests as it can in a fixed period of time.
 
-A significant problem with this benchmark is the lack of persistent
-connections in the HTTP client.  Lots of TCP connections means lots of
-overhead in the kernel that's not really what we're trying to benchmark. 
-Plus lots of sockets end up in TIME_WAIT which has a (briefly) persistent
-effect on system-wide performance and makes consecutive runs of the
-benchmark vary wildly in their results.
+A significant problem with this benchmark is the lack of persistent connections
+in the HTTP client.  Lots of TCP connections means lots of overhead in the
+kernel that's not really what we're trying to benchmark.  Plus lots of sockets
+end up in TIME_WAIT which has a (briefly) persistent effect on system-wide
+performance and makes consecutive runs of the benchmark vary wildly in their
+results.
 """
 
 from twisted.internet.protocol import Protocol
