@@ -5,7 +5,8 @@ keys.
 """
 
 from twisted.internet.defer import Deferred, succeed
-from twisted.internet.protocol import ClientFactory
+from twisted.internet.endpoints import TCP4ClientEndpoint
+from twisted.internet.protocol import Factory
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.conch.ssh.keys import Key
 from twisted.conch.ssh.transport import SSHClientTransport
@@ -44,33 +45,37 @@ class SimpleTransport(SSHClientTransport):
 
 
 class Client(Client):
-    def __init__(self, reactor, port):
+    def __init__(self, reactor, server):
         super(Client, self).__init__(reactor)
-        self._port = port
+        self._server = server
 
 
     def _request(self):
-        client = ClientFactory()
+        client = Factory()
         client.protocol = SimpleTransport
         client.finished = Deferred()
         client.finished.addCallback(self._continue)
         client.finished.addErrback(self._stop)
-        self._reactor.connectTCP('127.0.0.1', self._port, client)
+        self._server.connect(client)
 
+
+class BenchmarkSSHFactory(SSHFactory):
+    publicKeys = {
+        'ssh-rsa': Key.fromString(data=PUBLIC_KEY),
+        }
+    privateKeys = {
+        'ssh-rsa': Key.fromString(data=PRIVATE_KEY),
+        }
 
 
 def main(reactor, duration):
-    server = SSHFactory()
-    server.publicKeys = {
-        'ssh-rsa': Key.fromString(data=PUBLIC_KEY),
-        }
-    server.privateKeys = {
-        'ssh-rsa': Key.fromString(data=PRIVATE_KEY),
-        }
+    server = BenchmarkSSHFactory()
     port = reactor.listenTCP(0, server)
-    client = Client(reactor, port.getHost().port)
-    d = client.run(1, duration)
-    return d
+    client = Client(
+        reactor,
+        TCP4ClientEndpoint(reactor, '127.0.0.1', port.getHost().port))
+    return client.run(1, duration)
+
 
 
 if __name__ == '__main__':
