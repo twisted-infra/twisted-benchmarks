@@ -8,7 +8,8 @@ factor in the performance of this benchmark.
 """
 
 from twisted.internet.defer import Deferred
-from twisted.internet.protocol import ServerFactory, ClientCreator, Protocol
+from twisted.internet.endpoints import TCP4ClientEndpoint
+from twisted.internet.protocol import ServerFactory, Factory, Protocol
 from twisted.protocols.wire import Echo
 
 from benchlib import driver
@@ -25,17 +26,18 @@ class Counter(Protocol):
 class Client(object):
     _finished = None
 
-    def __init__(self, reactor, port):
+    def __init__(self, reactor, server):
         self._reactor = reactor
-        self._port = port
+        self._server = server
 
 
     def run(self, duration, chunkSize):
         self._duration = duration
         self._bytes = 'x' * chunkSize
         # Set up a connection
-        cc = ClientCreator(self._reactor, Counter)
-        d = cc.connectTCP('127.0.0.1', self._port)
+        factory = Factory()
+        factory.protocol = Counter
+        d = self._server.connect(factory)
         d.addCallback(self._connected)
         return d
 
@@ -73,14 +75,17 @@ class Client(object):
         self._finish(reason)
 
 
- 
+
 def main(reactor, duration):
     chunkSize = 16384
 
     server = ServerFactory()
     server.protocol = Echo
     serverPort = reactor.listenTCP(0, server)
-    client = Client(reactor, serverPort.getHost().port)
+    client = Client(
+        reactor,
+        TCP4ClientEndpoint(
+            reactor, '127.0.0.1', serverPort.getHost().port))
     d = client.run(duration, chunkSize)
     return d
 
