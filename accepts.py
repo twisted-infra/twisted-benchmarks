@@ -30,6 +30,7 @@ class CloseConnection(Protocol):
         transport.loseConnection()
 
 
+
 interface = 0
 def main(reactor, duration):
     concurrency = 50
