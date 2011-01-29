@@ -5,7 +5,6 @@ with a 2048 bit RSA key as well as a client which pumps as much data to that
 server as it can in a fixed period of time.
 """
 
-from twisted.python.filepath import FilePath
 from twisted.internet.protocol import ServerFactory
 from twisted.internet.endpoints import SSL4ClientEndpoint
 from twisted.internet.ssl import (

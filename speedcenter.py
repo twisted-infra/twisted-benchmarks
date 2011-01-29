@@ -26,6 +26,8 @@ SPEEDCENTER_NAMES = {
     'tcp': 'TCP Throughput',
     'ssh_connect': 'SSH Connections',
     'ssh_throughput': 'SSH Throughput',
+    'ssl_connect': 'SSL Connections',
+    'ssl': 'SSL Throughput',
     }
 
 
