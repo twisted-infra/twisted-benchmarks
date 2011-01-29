@@ -20,6 +20,14 @@ from twisted.python.usage import UsageError
 from all import allBenchmarks
 from benchlib import BenchmarkOptions, Driver
 
+# Unfortunately, benchmark name is the primary key for speedcenter
+SPEEDCENTER_NAMES = {
+    'accepts': 'TCP Connections',
+    'tcp': 'TCP Throughput',
+    'ssh_connect': 'SSH Connections',
+    'ssh_throughput': 'SSH Throughput',
+    }
+
 
 class SpeedcenterOptions(BenchmarkOptions):
     optParameters = [
@@ -81,6 +89,7 @@ def main():
         totalCount = sum([count for (count, duration) in results])
         totalDuration = sum([duration for (count, duration) in results])
 
+        name = SPEEDCENTER_NAMES.get(name, name)
         stats = environment.copy()
         stats['benchmark'] = name
         stats['result_value'] = totalCount / totalDuration
