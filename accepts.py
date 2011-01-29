@@ -7,8 +7,14 @@ from twisted.internet.endpoints import TCP4ClientEndpoint
 from benchlib import Client, driver
 
 
+class CloseConnection(Protocol):
+    def makeConnection(self, transport):
+        transport.loseConnection()
+
+
+
 class Client(Client):
-    protocol = Protocol
+    protocol = CloseConnection
 
     def __init__(self, reactor, server):
         super(Client, self).__init__(reactor)
@@ -22,12 +28,6 @@ class Client(Client):
         d = self._server.connect(factory)
         d.addCallback(self._continue)
         d.addErrback(self._stop)
-
-
-
-class CloseConnection(Protocol):
-    def makeConnection(self, transport):
-        transport.loseConnection()
 
 
 
