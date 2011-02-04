@@ -28,6 +28,8 @@ SPEEDCENTER_NAMES = {
     'ssh_throughput': 'SSH Throughput',
     'ssl_connect': 'SSL Connections',
     'ssl_throughput': 'SSL Throughput',
+    'sslbio_connect': 'SSL (Memory BIO) Connections',
+    'sslbio_throughput': 'SSL (Memory BIO) Throughput',
     }
 
 
