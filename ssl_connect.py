@@ -5,8 +5,8 @@ from benchlib import driver
 from twisted.internet.protocol import Factory, Protocol
 from twisted.internet.endpoints import SSL4ServerEndpoint, SSL4ClientEndpoint
 
-from ssl import cert
-from accepts import CloseConnection, Client
+from ssl_throughput import cert
+from tcp_connect import CloseConnection, Client
 
 
 class WriteOneByte(Protocol):

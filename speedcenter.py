@@ -22,12 +22,12 @@ from benchlib import BenchmarkOptions, Driver
 
 # Unfortunately, benchmark name is the primary key for speedcenter
 SPEEDCENTER_NAMES = {
-    'accepts': 'TCP Connections',
-    'tcp': 'TCP Throughput',
+    'tcp_connect': 'TCP Connections',
+    'tcp_throughput': 'TCP Throughput',
     'ssh_connect': 'SSH Connections',
     'ssh_throughput': 'SSH Throughput',
     'ssl_connect': 'SSL Connections',
-    'ssl': 'SSL Throughput',
+    'ssl_throughput': 'SSL Throughput',
     }
 
 

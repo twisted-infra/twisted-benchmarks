@@ -10,7 +10,7 @@ from twisted.conch.ssh.userauth import SSHUserAuthClient
 from twisted.conch.ssh.session import ISession, SSHSession
 
 from ssh_connect import BenchmarkSSHFactory
-from tcp import Client
+from tcp_throughput import Client
 
 from sshendpoint import SSHCommandClientEndpoint
 

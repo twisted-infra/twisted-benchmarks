@@ -52,5 +52,5 @@ def main(reactor, duration):
 
 if __name__ == '__main__':
     import sys
-    import accepts
-    driver(accepts.main, sys.argv)
+    import tcp_connect
+    driver(tcp_connect.main, sys.argv)

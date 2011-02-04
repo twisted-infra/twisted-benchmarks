@@ -11,7 +11,7 @@ from twisted.internet.ssl import (
     DN, KeyPair, PrivateCertificate, CertificateOptions)
 from twisted.protocols.wire import Echo
 
-from tcp import Client, driver
+from tcp_throughput import Client, driver
 
 # Generate a new self-signed certificate
 key = KeyPair.generate(size=2048)
@@ -42,5 +42,5 @@ def main(reactor, duration):
 
 if __name__ == '__main__':
     import sys
-    import ssl
-    driver(ssl.main, sys.argv)
+    import ssl_throughput
+    driver(ssl_throughput.main, sys.argv)

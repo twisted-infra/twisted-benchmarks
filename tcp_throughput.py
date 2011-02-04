@@ -92,5 +92,5 @@ def main(reactor, duration):
 
 if __name__ == '__main__':
     import sys
-    import tcp
-    driver(tcp.main, sys.argv)
+    import tcp_throughput
+    driver(tcp_throughput.main, sys.argv)
