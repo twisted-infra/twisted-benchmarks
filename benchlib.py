@@ -90,7 +90,6 @@ def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
             d.callback(None)
         else:
             try:
-                print f.__module__, len(reactor.getReaders())
                 next = f(reactor, duration)
             except:
                 d.errback()
