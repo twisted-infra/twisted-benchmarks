@@ -42,6 +42,10 @@ class Client(object):
         return d
 
 
+    def cleanup(self):
+        self._client.transport.loseConnection()
+
+
     def _connected(self, client):
         self._client = client
         self._stopCall = self._reactor.callLater(self._duration, self._stop)
@@ -68,7 +72,7 @@ class Client(object):
 
 
     def stopProducing(self):
-        self._client.transport.loseConnection()
+        self.cleanup()
 
 
     def connectionLost(self, reason):
@@ -81,12 +85,17 @@ def main(reactor, duration):
 
     server = ServerFactory()
     server.protocol = Echo
-    serverPort = reactor.listenTCP(0, server)
+    port = reactor.listenTCP(0, server)
     client = Client(
         reactor,
         TCP4ClientEndpoint(
-            reactor, '127.0.0.1', serverPort.getHost().port))
+            reactor, '127.0.0.1', port.getHost().port))
     d = client.run(duration, chunkSize)
+    def cleanup(passthrough):
+        d = port.stopListening()
+        d.addCallback(lambda ignored: passthrough)
+        return d
+    d.addCallback(cleanup)
     return d
 
 

@@ -24,17 +24,25 @@ class Client(object):
         self._reactor = reactor
         self._requestCount = 0
 
+
     def run(self, concurrency, duration):
         self._reactor.callLater(duration, self._stop, None)
         self._finished = Deferred()
+        self._finished.addBoth(self._cleanup)
         for i in range(concurrency):
             self._request()
         return self._finished
+
+
+    def cleanup(self):
+        pass
+
 
     def _continue(self, ignored):
         self._requestCount += 1
         if self._finished is not None:
             self._request()
+
 
     def _stop(self, reason):
         if self._finished is not None:
@@ -44,6 +52,11 @@ class Client(object):
                 finished.errback(reason)
             else:
                 finished.callback(self._requestCount)
+
+
+    def _cleanup(self, passthrough):
+        self.cleanup()
+        return passthrough
 
 
 
@@ -77,6 +90,7 @@ def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
             d.callback(None)
         else:
             try:
+                print f.__module__, len(reactor.getReaders())
                 next = f(reactor, duration)
             except:
                 d.errback()

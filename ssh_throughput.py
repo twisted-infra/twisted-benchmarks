@@ -17,6 +17,13 @@ from sshendpoint import SSHCommandClientEndpoint
 from benchlib import driver
 
 
+class Client(Client):
+    def cleanup(self):
+        # The base implementation should work, but does not.
+        self._client.transport.conn.transport.transport.loseConnection()
+
+
+
 class SSHPasswordUserAuth(SSHUserAuthClient):
     def __init__(self, user, password, instance):
         SSHUserAuthClient.__init__(self, user, instance)
@@ -90,7 +97,13 @@ def main(reactor, duration):
             SSHPasswordUserAuth('username', 'password', command))
 
     client = Client(reactor, sshServer)
-    return client.run(duration, chunkSize)
+    d = client.run(duration, chunkSize)
+    def cleanup(passthrough):
+        d = port.stopListening()
+        d.addCallback(lambda ignored: passthrough)
+        return d
+    d.addCallback(cleanup)
+    return d
 
 
 

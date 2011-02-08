@@ -28,14 +28,19 @@ def main(reactor, duration):
 
     server = ServerFactory()
     server.protocol = Echo
-    serverPort = reactor.listenSSL(0, server, cert.options())
+    port = reactor.listenSSL(0, server, cert.options())
     client = Client(
         reactor,
         SSL4ClientEndpoint(
-            reactor, '127.0.0.1', serverPort.getHost().port,
+            reactor, '127.0.0.1', port.getHost().port,
             CertificateOptions(
                 verify=True, requireCertificate=True, caCerts=[cert.original])))
     d = client.run(duration, chunkSize)
+    def cleanup(passthrough):
+        d = port.stopListening()
+        d.addCallback(lambda ignored: passthrough)
+        return d
+    d.addCallback(cleanup)
     return d
 
 

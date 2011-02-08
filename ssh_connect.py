@@ -74,7 +74,13 @@ def main(reactor, duration):
     client = Client(
         reactor,
         TCP4ClientEndpoint(reactor, '127.0.0.1', port.getHost().port))
-    return client.run(1, duration)
+    d = client.run(1, duration)
+    def cleanup(passthrough):
+        d = port.stopListening()
+        d.addCallback(lambda ignored: passthrough)
+        return d
+    d.addCallback(cleanup)
+    return d
 
 
 

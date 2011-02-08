@@ -37,7 +37,13 @@ def main(reactor, duration):
             reactor, SSL4ClientEndpoint(
                 reactor, interface, port.getHost().port,
                 contextFactory, bindAddress=(interface, 0)))
-        return client.run(concurrency, duration)
+        d = client.run(concurrency, duration)
+        def cleanup(passthrough):
+            d = port.stopListening()
+            d.addCallback(lambda ignored: passthrough)
+            return d
+        d.addCallback(cleanup)
+        return d
     listen.addCallback(cbListening)
     return listen
 

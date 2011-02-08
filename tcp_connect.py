@@ -31,7 +31,6 @@ class Client(Client):
 
 
 
-interface = 0
 def main(reactor, duration):
     concurrency = 50
 
@@ -46,6 +45,11 @@ def main(reactor, duration):
             reactor, port.getHost().host, port.getHost().port,
             bindAddress=(interface, 0)))
     d = client.run(concurrency, duration)
+    def cleanup(passthrough):
+        d = port.stopListening()
+        d.addCallback(lambda ignored: passthrough)
+        return d
+    d.addCallback(cleanup)
     return d
 
 
