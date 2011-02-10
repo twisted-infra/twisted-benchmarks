@@ -130,14 +130,17 @@ class Driver(object):
         from twisted.internet import reactor
 
         def work(job):
-            return perform_benchmark(
+            d = perform_benchmark(
                 reactor, duration, iterations, warmup,
                 job, self.benchmark_report)
+            d.addErrback(
+                log.err, "Problem running benchmark %s" % (job.__module__,))
+            return d
 
         def go():
             task = cooperate(work(job) for job in f)
             d = task.whenDone()
-            d.addErrback(log.err)
+            d.addErrback(log.err, "Problem coordinating benchmarks")
             d.addCallback(lambda ignored: reactor.stop())
 
         reactor.callWhenRunning(go)
