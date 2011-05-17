@@ -53,7 +53,7 @@ class SpeedcenterDriver(Driver):
 def reportEnvironment():
     revision = twisted.version.short().split('r', 1)[1]
 
-    packageDirectory = FilePath(twisted.__file__).parent().path
+    packageDirectory = FilePath(twisted.__file__).parent()
 
     try:
         import pysvn
@@ -61,11 +61,11 @@ def reportEnvironment():
         entries = packageDirectory.child('.svn').child('entries').getContent()
         lines = entries.splitlines()
         revision = lines[3]
-        date = str(datetime.fromtimestamp(lines[9]))
+        date = lines[9][:20].replace('T', ' ')
     else:
         client = pysvn.Client()
         [entry] = client.log(
-            packageDirectory,
+            packageDirectory.path,
             pysvn.Revision(pysvn.opt_revision_kind.number, int(revision)),
             limit=1)
         date = str(datetime.fromtimestamp(entry['date']))
