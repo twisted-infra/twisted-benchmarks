@@ -11,8 +11,6 @@ from sys import executable
 from datetime import datetime
 from urllib import urlopen, urlencode
 
-import pysvn
-
 import twisted
 from twisted.python.filepath import FilePath
 from twisted.python.usage import UsageError
@@ -55,12 +53,22 @@ class SpeedcenterDriver(Driver):
 def reportEnvironment():
     revision = twisted.version.short().split('r', 1)[1]
 
-    client = pysvn.Client()
-    [entry] = client.log(
-        FilePath(twisted.__file__).parent().path,
-        pysvn.Revision(pysvn.opt_revision_kind.number, int(revision)),
-        limit=1)
-    date = str(datetime.fromtimestamp(entry['date']))
+    packageDirectory = FilePath(twisted.__file__).parent().path
+
+    try:
+        import pysvn
+    except ImportError:
+        entries = packageDirectory.child('.svn').child('entries').getContent()
+        lines = entries.splitlines()
+        revision = lines[3]
+        date = str(datetime.fromtimestamp(lines[9]))
+    else:
+        client = pysvn.Client()
+        [entry] = client.log(
+            packageDirectory,
+            pysvn.Revision(pysvn.opt_revision_kind.number, int(revision)),
+            limit=1)
+        date = str(datetime.fromtimestamp(entry['date']))
 
     return {
         'project': 'Twisted',
