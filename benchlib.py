@@ -105,10 +105,10 @@ class Driver(object):
     benchmark_report = staticmethod(benchmark_report)
 
     def driver(self, f, argv):
-        from twisted.internet import reactor
-
         options = BenchmarkOptions()
         options.parseOptions(argv[1:])
+
+        from twisted.internet import reactor
 
         d = perform_benchmark(
             reactor,
