@@ -6,6 +6,7 @@ from benchlib import multidriver
 allBenchmarkNames = [
     "iteration", "names", "threads", "web", "pb", "amp",
     "deferred_callback_chains",
+    "linereceiver", "lineonlyreceiver","int16receiver",
 
     "tcp_connect", "ssh_connect", "ssl_connect", "sslbio_connect",
     "tcp_throughput", "ssh_throughput", "ssl_throughput", "sslbio_throughput",
