@@ -1,9 +1,9 @@
 
 from __future__ import division
 
-import sys
+import sys, subprocess
 
-from twisted.python import log
+from twisted.python import log, reflect
 from twisted.internet.defer import Deferred
 from twisted.internet.task import cooperate
 from twisted.application.app import ReactorSelectionMixin
@@ -104,6 +104,11 @@ def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
 class Driver(object):
     benchmark_report = staticmethod(benchmark_report)
 
+    def main(self):
+        benchmark = reflect.namedAny(sys.argv[1])
+        self.driver(benchmark, sys.argv[2:])
+
+
     def driver(self, f, argv):
         options = BenchmarkOptions()
         options.parseOptions(argv[1:])
@@ -119,11 +124,14 @@ class Driver(object):
         reactor.run()
 
 
-    def multidriver(self, f):
-        options = BenchmarkOptions()
-        options.parseOptions(sys.argv[1:])
-        self.run_jobs(
-            f, options['duration'], options['iterations'], options['warmup'])
+    def multidriver(self, benchmarks):
+        for benchmark in benchmarks:
+            child = subprocess.Popen([
+                    sys.executable, '-c',
+                    'import benchlib\n'
+                    'benchlib.main()\n',
+                    benchmark] + sys.argv[1:])
+            child.wait()
 
 
     def run_jobs(self, f, duration, iterations, warmup):
@@ -151,4 +159,5 @@ class Driver(object):
 _driver = Driver()
 driver = _driver.driver
 multidriver = _driver.multidriver
+main = _driver.main
 del _driver
