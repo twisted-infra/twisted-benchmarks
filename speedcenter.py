@@ -61,7 +61,7 @@ def reportEnvironment():
         entries = packageDirectory.child('.svn').child('entries').getContent()
         lines = entries.splitlines()
         revision = lines[3]
-        date = lines[9][:20].replace('T', ' ')
+        date = lines[9][:19].replace('T', ' ')
     else:
         client = pysvn.Client()
         [entry] = client.log(
@@ -73,7 +73,7 @@ def reportEnvironment():
     return {
         'project': 'Twisted',
         'executable': executable,
-        'environment': uname()[1],
+        'environment': uname()[1].split('.')[0],
         'commitid': revision,
         'revision_date': date,
         'result_date': str(datetime.now()),
