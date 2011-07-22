@@ -15,13 +15,12 @@ allBenchmarkNames = [
 allBenchmarks = []
 
 for name in allBenchmarkNames:
-    name = name + '.main'
     try:
-        main = namedAny(name)
+        main = namedAny(name).main
     except Exception, e:
         print 'Skipping', name, ':', e
     else:
-        allBenchmarks.append(name)
+        allBenchmarks.append(main)
 
 if __name__ == '__main__':
     multidriver(allBenchmarks)

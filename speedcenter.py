@@ -5,13 +5,7 @@ Evaluate one or more benchmarks and upload the results to a Speedcenter server.
 
 from __future__ import division
 
-if __name__ == '__main__':
-    from sys import argv
-    from all import allBenchmarks
-    from speedcenter import SpeedcenterDriver
-    print SpeedcenterDriver().multidriver(allBenchmarks, argv[1:])
-    raise SystemExit()
-
+from sys import argv, stdout
 from os import uname
 from sys import executable
 from datetime import datetime
@@ -21,6 +15,7 @@ import twisted
 from twisted.python.filepath import FilePath
 from twisted.python.usage import UsageError
 
+from all import allBenchmarks
 from benchlib import BenchmarkOptions, Driver
 
 # Unfortunately, benchmark name is the primary key for speedcenter
@@ -34,6 +29,25 @@ SPEEDCENTER_NAMES = {
     'sslbio_connect': 'SSL (Memory BIO) Connections',
     'sslbio_throughput': 'SSL (Memory BIO) Throughput',
     }
+
+
+class SpeedcenterOptions(BenchmarkOptions):
+    optParameters = [
+        ('url', None, None, 'Location of Speedcenter to which to upload results.'),
+        ]
+
+    def postOptions(self):
+        if not self['url']:
+            raise UsageError("The Speedcenter URL must be provided.")
+
+
+
+class SpeedcenterDriver(Driver):
+    def benchmark_report(self, acceptCount, duration, name):
+        print name, acceptCount, duration
+        stdout.flush()
+        self.results.setdefault(name, []).append((acceptCount, duration))
+
 
 
 def reportEnvironment():
@@ -66,58 +80,39 @@ def reportEnvironment():
         }
 
 
-class SpeedcenterOptions(BenchmarkOptions):
-    optParameters = [
-        ('url', None, None,
-         'Location of Speedcenter to which to upload results.'),
-        ]
 
-    def postOptions(self):
-        if not self['url']:
-            raise UsageError("The Speedcenter URL must be provided.")
+def main():
+    options = SpeedcenterOptions()
+    try:
+        options.parseOptions(argv[1:])
+    except UsageError, e:
+        raise SystemExit(str(e))
 
-
-
-class SpeedcenterDriver(Driver):
-    options = SpeedcenterOptions
-
-    def __init__(self):
-        super(SpeedcenterDriver, self).__init__()
-        self.results = {}
-
-
-    def benchmark_report(self, acceptCount, duration, name):
-        self.results.setdefault(name, []).append((acceptCount, duration))
-
-
-    def multidriver(self, benchmarks, argv):
-        raw = super(SpeedcenterDriver, self).multidriver(benchmarks, argv)
-        results = {}
-        for (name, stringValue) in raw.iteritems():
-            name = name.split('.')[0]
-            value = eval(stringValue).values()[0]
-            results[name] = value
-
-        environment = reportEnvironment()
-
-        for (name, values) in sorted(results.items()):
-            rates = [count / duration for (count, duration) in values]
-            totalCount = sum([count for (count, duration) in values])
-            totalDuration = sum([duration for (count, duration) in values])
-
-            name = SPEEDCENTER_NAMES.get(name, name)
-            stats = environment.copy()
-            stats['benchmark'] = name
-            stats['result_value'] = totalCount / totalDuration
-            stats['min'] = min(rates)
-            stats['max'] = max(rates)
-
-            # Please excuse me.
-            fObj = urlopen(self.options['url'], urlencode(stats))
-            print name, fObj.read()
-            fObj.close()
-
-def main(argv):
     driver = SpeedcenterDriver()
-    driver.main(argv)
-    print driver.results
+    driver.results = {}
+    driver.run_jobs(
+        allBenchmarks,
+        options['duration'], options['iterations'], options['warmup'])
+
+    environment = reportEnvironment()
+
+    for (name, results) in sorted(driver.results.items()):
+        rates = [count / duration for (count, duration) in results]
+        totalCount = sum([count for (count, duration) in results])
+        totalDuration = sum([duration for (count, duration) in results])
+
+        name = SPEEDCENTER_NAMES.get(name, name)
+        stats = environment.copy()
+        stats['benchmark'] = name
+        stats['result_value'] = totalCount / totalDuration
+        stats['min'] = min(rates)
+        stats['max'] = max(rates)
+
+        # Please excuse me.
+        fObj = urlopen(options['url'], urlencode(stats))
+        print name, fObj.read()
+        fObj.close()
+
+
+if __name__ == '__main__':
+    main()
