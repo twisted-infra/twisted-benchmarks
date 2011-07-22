@@ -1,11 +1,9 @@
-
 from __future__ import division
 
 import sys, subprocess
 
 from twisted.python import log, reflect
 from twisted.internet.defer import Deferred
-from twisted.internet.task import cooperate
 from twisted.application.app import ReactorSelectionMixin
 from twisted.python.usage import Options
 
@@ -73,13 +71,6 @@ def benchmark_report(acceptCount, duration, name):
 
 
 
-def setup_driver(f, argv, reactor, reporter):
-    return perform_benchmark(
-        reactor,
-        options['duration'], options['iterations'], options['warmup'],
-        f, reporter)
-
-
 def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
     jobs = [f] * iterations
     d = Deferred()
@@ -104,60 +95,45 @@ def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
 class Driver(object):
     benchmark_report = staticmethod(benchmark_report)
 
-    def main(self):
-        benchmark = reflect.namedAny(sys.argv[1])
-        self.driver(benchmark, sys.argv[2:])
+    options = BenchmarkOptions
+
+    def main(self, argv):
+        benchmark = reflect.namedAny(argv[0])
+        self.driver(benchmark, argv[1:])
 
 
     def driver(self, f, argv):
-        options = BenchmarkOptions()
-        options.parseOptions(argv[1:])
+        self.options = self.options()
+        self.options.parseOptions(argv)
 
         from twisted.internet import reactor
 
         d = perform_benchmark(
             reactor,
-            options['duration'], options['iterations'], options['warmup'],
-            f, benchmark_report)
+            self.options['duration'], self.options['iterations'],
+            self.options['warmup'], f, self.benchmark_report)
         d.addErrback(log.err)
         reactor.callWhenRunning(d.addBoth, lambda ign: reactor.stop())
         reactor.run()
 
 
-    def multidriver(self, benchmarks):
+    def multidriver(self, benchmarks, argv):
+        results = {}
         for benchmark in benchmarks:
             child = subprocess.Popen([
                     sys.executable, '-c',
-                    'import benchlib\n'
-                    'benchlib.main()\n',
-                    benchmark] + sys.argv[1:])
-            child.wait()
+                    'from sys import argv\n'
+                    'from twisted.python.reflect import namedAny\n'
+                    'benchlib = namedAny(argv[1])\n'
+                    'benchlib.main(argv[2:])\n',
+                    self.__module__, benchmark] + argv,
+                                     stdout=subprocess.PIPE)
+            stdout, stderr = child.communicate()
+            results[benchmark] = stdout
+            print 'done'
+        return results
 
 
-    def run_jobs(self, f, duration, iterations, warmup):
-        from twisted.internet import reactor
-
-        def work(job):
-            d = perform_benchmark(
-                reactor, duration, iterations, warmup,
-                job, self.benchmark_report)
-            d.addErrback(
-                log.err, "Problem running benchmark %s" % (job.__module__,))
-            return d
-
-        def go():
-            task = cooperate(work(job) for job in f)
-            d = task.whenDone()
-            d.addErrback(log.err, "Problem coordinating benchmarks")
-            d.addCallback(lambda ignored: reactor.stop())
-
-        reactor.callWhenRunning(go)
-        reactor.run()
-
-
-
-_driver = Driver()
-driver = _driver.driver
-multidriver = _driver.multidriver
-main = _driver.main
-del _driver
+driver = Driver().driver
+multidriver = Driver().multidriver
+main = Driver().main
