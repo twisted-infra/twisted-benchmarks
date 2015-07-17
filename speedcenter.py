@@ -3,13 +3,21 @@
 Evaluate one or more benchmarks and upload the results to a Speedcenter server.
 """
 
-from __future__ import division
+from __future__ import division, print_function
+
+import subprocess
+import json
+import requests
 
 from sys import argv, stdout
 from os import uname
 from sys import executable
 from datetime import datetime
-from urllib import urlopen, urlencode
+try:
+    from urllib import urlopen, urlencode
+except ImportError:
+    from urllib.request import urlopen
+    from urllib.parse import urlencode
 
 import twisted
 from twisted.python.filepath import FilePath
@@ -44,7 +52,7 @@ class SpeedcenterOptions(BenchmarkOptions):
 
 class SpeedcenterDriver(Driver):
     def benchmark_report(self, acceptCount, duration, name):
-        print name, acceptCount, duration
+        print(name, acceptCount, duration)
         stdout.flush()
         self.results.setdefault(name, []).append((acceptCount, duration))
 
@@ -85,7 +93,7 @@ def main():
     options = SpeedcenterOptions()
     try:
         options.parseOptions(argv[1:])
-    except UsageError, e:
+    except UsageError as e:
         raise SystemExit(str(e))
 
     driver = SpeedcenterDriver()
