@@ -59,33 +59,24 @@ class SpeedcenterDriver(Driver):
 
 
 def reportEnvironment():
-    revision = twisted.version.short().split('r', 1)[1]
 
     packageDirectory = FilePath(twisted.__file__).parent()
 
-    try:
-        import pysvn
-    except ImportError:
-        entries = packageDirectory.child('.svn').child('entries').getContent()
-        lines = entries.splitlines()
-        revision = lines[3]
-        date = lines[9][:19].replace('T', ' ')
-    else:
-        client = pysvn.Client()
-        [entry] = client.log(
-            packageDirectory.path,
-            pysvn.Revision(pysvn.opt_revision_kind.number, int(revision)),
-            limit=1)
-        date = str(datetime.fromtimestamp(entry['date']))
+    lines = subprocess.check_output(["git", "show", "-q", "--date=iso"]).split("\n")
+    revision = lines[0].split()[1]
+    date = lines[2].split(" ", 1)[1].strip().split(" +")[0]
 
-    return {
+    resp = {
         'project': 'Twisted',
         'executable': executable,
         'environment': uname()[1].split('.')[0],
         'commitid': revision,
+        'branch': 'default',
         'revision_date': date,
-        'result_date': str(datetime.now()),
-        }
+        'result_date': str(datetime.now())[0:-7],
+    }
+    print(resp)
+    return resp
 
 
 
