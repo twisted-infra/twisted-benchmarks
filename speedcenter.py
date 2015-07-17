@@ -95,6 +95,8 @@ def main():
 
     environment = reportEnvironment()
 
+    allStats = []
+
     for (name, results) in sorted(driver.results.items()):
         rates = [count / duration for (count, duration) in results]
         totalCount = sum([count for (count, duration) in results])
@@ -106,11 +108,19 @@ def main():
         stats['result_value'] = totalCount / totalDuration
         stats['min'] = min(rates)
         stats['max'] = max(rates)
+        allStats.append(stats)
 
-        # Please excuse me.
-        fObj = urlopen(options['url'], urlencode(stats))
-        print name, fObj.read()
-        fObj.close()
+    tries = 0
+    r = None
+
+    while tries < 5:
+        r = requests.post(options['url'], data={"json": json.dumps(allStats)})
+        if r.status_code == 202:
+            print(r.content)
+            return
+        tries = tries + 1
+        print("Try #{}".format(tries))
+    print(r.content)
 
 
 if __name__ == '__main__':
