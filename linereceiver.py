@@ -7,7 +7,7 @@ class LineReceiver(LineReceiver):
         pass
 
 main = makeMain(LineReceiver,
-                (("a" * 50) + "\r\n") * 1000)
+                ((b"a" * 50) + b"\r\n") * 1000)
 main.__module__ = "lines"
 
 
@@ -16,4 +16,3 @@ if __name__ == '__main__':
     import linereceiver
     from benchlib import driver
     driver(linereceiver.main, sys.argv)
-

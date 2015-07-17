@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 
 from twisted.python.reflect import namedAny
 
@@ -17,8 +19,8 @@ allBenchmarks = []
 for name in allBenchmarkNames:
     try:
         main = namedAny(name).main
-    except Exception, e:
-        print 'Skipping', name, ':', e
+    except Exception as e:
+        print('Skipping', name, ':', e)
     else:
         allBenchmarks.append(main)
 

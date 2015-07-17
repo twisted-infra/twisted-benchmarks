@@ -11,7 +11,7 @@ class LineOnlyReceiver(LineOnlyReceiver):
         pass
 
 main = makeMain(LineOnlyReceiver,
-                (("a" * 50) + "\r\n") * 1000)
+                ((b"a" * 50) + b"\r\n") * 1000)
 main.__module__ = "only-lines"
 
 if __name__ == '__main__':
@@ -19,4 +19,3 @@ if __name__ == '__main__':
     import lineonlyreceiver
     from benchlib import driver
     driver(lineonlyreceiver.main, sys.argv)
-

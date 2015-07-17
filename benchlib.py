@@ -1,5 +1,5 @@
 
-from __future__ import division
+from __future__ import division, print_function
 
 import sys
 
@@ -64,12 +64,12 @@ PRINT_TEMPL = ('%(stats)s %(name)s/sec (%(count)s %(name)s '
               'in %(duration)s seconds)')
 
 def benchmark_report(acceptCount, duration, name):
-    print PRINT_TEMPL % {
+    print(PRINT_TEMPL % {
         'stats'    : acceptCount / duration,
         'name'     : name,
         'count'    : acceptCount,
         'duration' : duration
-        }
+        })
 
 
 
@@ -90,13 +90,13 @@ def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
             d.callback(None)
         else:
             try:
-                next = f(reactor, duration)
+                nxt = f(reactor, duration)
             except:
                 d.errback()
             else:
                 if counter <= 0:
-                    next.addCallback(reporter, duration, f.__module__)
-                next.addCallbacks(work, d.errback, (counter - 1,))
+                    nxt.addCallback(reporter, duration, f.__module__)
+                nxt.addCallbacks(work, d.errback, (counter - 1,))
     work(None, warmup)
     return d
 

@@ -9,7 +9,7 @@ class Int16StringReceiver(Int16StringReceiver):
 
 
 main = makeMain(Int16StringReceiver,
-                (struct.pack("!H", 50) + "a" * 50) * 1000)
+                (struct.pack("!H", 50) + b"a" * 50) * 1000)
 main.__module__ = "int16strings"
 
 if __name__ == '__main__':
@@ -17,4 +17,3 @@ if __name__ == '__main__':
     import int16receiver
     from benchlib import driver
     driver(int16receiver.main, sys.argv)
-
