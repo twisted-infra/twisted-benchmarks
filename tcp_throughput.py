@@ -18,8 +18,8 @@ from benchlib import driver
 class Counter(Protocol):
     count = 0
 
-    def dataReceived(self, bytes):
-        self.count += len(bytes)
+    def dataReceived(self, b):
+        self.count += len(b)
 
 
 
@@ -33,7 +33,7 @@ class Client(object):
 
     def run(self, duration, chunkSize):
         self._duration = duration
-        self._bytes = 'x' * chunkSize
+        self._bytes = b'x' * chunkSize
         # Set up a connection
         factory = Factory()
         factory.protocol = Counter

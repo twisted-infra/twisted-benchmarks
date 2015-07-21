@@ -11,7 +11,7 @@ from tcp_connect import CloseConnection, Client
 
 class WriteOneByte(Protocol):
     def connectionMade(self):
-        self.transport.write("x")
+        self.transport.write(b"x")
 
 
 

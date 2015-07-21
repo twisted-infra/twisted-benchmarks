@@ -16,7 +16,13 @@ from twisted.internet.defer import Deferred
 from twisted.web.server import Site
 from twisted.web.static import Data
 from twisted.web.resource import Resource
-from twisted.web.client import ResponseDone, Agent
+from twisted.web.client import Agent
+from twisted.python.compat import networkString
+
+try:
+    from twisted.web.client import ResponseDone
+except ImportError:
+    from twisted.web._newclient import ResponseDone
 
 from benchlib import Client, driver
 
@@ -41,7 +47,7 @@ class Client(Client):
 
 
     def _request(self):
-        d = self._agent.request('GET', self._requestLocation)
+        d = self._agent.request(b'GET', self._requestLocation)
         d.addCallback(self._read)
         d.addCallback(self._continue)
         d.addErrback(self._stop)

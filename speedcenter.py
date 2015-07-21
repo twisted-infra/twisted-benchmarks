@@ -21,6 +21,7 @@ except ImportError:
 
 import twisted
 from twisted.python.filepath import FilePath
+from twisted.python.compat import nativeString
 from twisted.python.usage import UsageError
 
 from all import allBenchmarks
@@ -62,17 +63,17 @@ def reportEnvironment():
 
     packageDirectory = FilePath(twisted.__file__).parent()
 
-    lines = subprocess.check_output(["git", "show", "-q", "--date=iso"]).split("\n")
+    lines = subprocess.check_output(["git", "show", "-q", "--date=iso"]).split(b"\n")
     revision = lines[0].split()[1]
-    date = lines[2].split(" ", 1)[1].strip().split(" +")[0]
+    date = lines[2].split(b" ", 1)[1].strip().split(b" +")[0]
 
     resp = {
         'project': 'Twisted',
         'executable': executable,
         'environment': uname()[1].split('.')[0],
-        'commitid': revision,
+        'commitid': nativeString(revision),
         'branch': 'default',
-        'revision_date': date,
+        'revision_date': nativeString(date),
         'result_date': str(datetime.now())[0:-7],
     }
     print(resp)
