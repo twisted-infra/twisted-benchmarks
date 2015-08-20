@@ -72,14 +72,6 @@ def benchmark_report(acceptCount, duration, name):
         })
 
 
-
-def setup_driver(f, argv, reactor, reporter):
-    return perform_benchmark(
-        reactor,
-        options['duration'], options['iterations'], options['warmup'],
-        f, reporter)
-
-
 def perform_benchmark(reactor, duration, iterations, warmup, f, reporter):
     jobs = [f] * iterations
     d = Deferred()

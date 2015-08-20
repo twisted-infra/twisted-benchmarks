@@ -6,7 +6,7 @@ from zope.interface import implements
 from twisted.python.failure import Failure
 from twisted.python.log import err
 from twisted.internet.error import ConnectionDone
-from twisted.internet.defer import Deferred, succeed, setDebugging
+from twisted.internet.defer import Deferred, succeed
 from twisted.internet.interfaces import IStreamClientEndpoint
 from twisted.internet.protocol import Factory, Protocol
 
@@ -154,7 +154,6 @@ def copyToStdout(endpoint):
 
 
 def main():
-    from twisted.python.log import startLogging
     from twisted.internet import reactor
     from twisted.internet.endpoints import TCP4ClientEndpoint
 

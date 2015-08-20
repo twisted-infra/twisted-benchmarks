@@ -13,14 +13,7 @@ from sys import argv, stdout
 from os import uname, path
 from sys import executable
 from datetime import datetime
-try:
-    from urllib import urlopen, urlencode
-except ImportError:
-    from urllib.request import urlopen
-    from urllib.parse import urlencode
 
-import twisted
-from twisted.python.filepath import FilePath
 from twisted.python.compat import nativeString
 from twisted.python.usage import UsageError
 
@@ -60,9 +53,6 @@ class SpeedcenterDriver(Driver):
 
 
 def reportEnvironment():
-
-    packageDirectory = FilePath(twisted.__file__).parent()
-
     lines = subprocess.check_output(["git", "show", "-q", "--date=iso"]).split(b"\n")
     revision = lines[0].split()[1]
     date = lines[2].split(b" ", 1)[1].strip().split(b" +")[0]
