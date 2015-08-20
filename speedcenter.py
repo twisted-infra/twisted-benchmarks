@@ -10,7 +10,7 @@ import json
 import requests
 
 from sys import argv, stdout
-from os import uname
+from os import uname, path
 from sys import executable
 from datetime import datetime
 try:
@@ -67,9 +67,11 @@ def reportEnvironment():
     revision = lines[0].split()[1]
     date = lines[2].split(b" ", 1)[1].strip().split(b" +")[0]
 
+    exec_trimmed = path.basename(executable)
+
     resp = {
         'project': 'Twisted',
-        'executable': executable,
+        'executable': exec_trimmed,
         'environment': uname()[1].split('.')[0],
         'commitid': nativeString(revision),
         'branch': 'default',
