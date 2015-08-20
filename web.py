@@ -19,10 +19,7 @@ from twisted.web.resource import Resource
 from twisted.web.client import Agent
 from twisted.python.compat import networkString
 
-try:
-    from twisted.web.client import ResponseDone
-except ImportError:
-    from twisted.web._newclient import ResponseDone
+from twisted.web.client import ResponseDone
 
 from benchlib import Client, driver
 
@@ -41,7 +38,7 @@ class BodyConsumer(Protocol):
 
 class Client(Client):
     def __init__(self, reactor, host, portNumber, agent):
-        self._requestLocation = 'http://%s:%d/' % (host, portNumber,)
+        self._requestLocation = networkString('http://%s:%d/' % (host, portNumber,))
         self._agent = agent
         super(Client, self).__init__(reactor)
 
@@ -66,7 +63,7 @@ def main(reactor, duration):
     concurrency = 10
 
     root = Resource()
-    root.putChild('', Data("Hello, world", "text/plain"))
+    root.putChild(b'', Data(b"Hello, world", "text/plain"))
 
     interface += 1
     interface %= 255
