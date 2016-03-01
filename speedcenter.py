@@ -79,6 +79,8 @@ def main():
     except UsageError as e:
         raise SystemExit(str(e))
 
+    environment = reportEnvironment()
+
     from all import allBenchmarks
 
     driver = SpeedcenterDriver()
@@ -86,8 +88,6 @@ def main():
     driver.run_jobs(
         allBenchmarks,
         options['duration'], options['iterations'], options['warmup'])
-
-    environment = reportEnvironment()
 
     allStats = []
 
