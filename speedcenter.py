@@ -17,7 +17,6 @@ from datetime import datetime
 from twisted.python.compat import nativeString
 from twisted.python.usage import UsageError
 
-from all import allBenchmarks
 from benchlib import BenchmarkOptions, Driver
 
 # Unfortunately, benchmark name is the primary key for speedcenter
@@ -79,6 +78,8 @@ def main():
         options.parseOptions(argv[1:])
     except UsageError as e:
         raise SystemExit(str(e))
+
+    from all import allBenchmarks
 
     driver = SpeedcenterDriver()
     driver.results = {}
