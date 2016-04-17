@@ -14,9 +14,9 @@ from benchlib import driver
 
 class Elem(Element):
     loader = XMLString(
-        """
+        b"""
         <div xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
-        """ + "A" * 1000 + """
+        """ + b"A" * 1000 + b"""
         <div t:render="r" />
         <div t:render="r2" />
         <div t:render="r3">
@@ -48,7 +48,7 @@ class Elem(Element):
         return tag.fillSlots(
             meep=(u'slotvalue',
                   u'42',
-                  'bar',
+                  b'bar',
                   tags.div(u'meep', attr=u'value')))
 
 
