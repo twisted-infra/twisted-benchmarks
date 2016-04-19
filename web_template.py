@@ -1,10 +1,11 @@
 """
 Benchmark for twisted.web.template rendering.
 """
-from StringIO import StringIO
+from io import BytesIO
 from time import time
 
 from twisted.internet.defer import succeed
+from twisted.python.compat import xrange
 from twisted.web.template import (
     Element, flatten, renderer, TagLoader, tags, XMLString)
 
@@ -58,7 +59,7 @@ def render():
     for _ in xrange(20):
         child = Elem([child])
     root = TagLoader([child] * 10).load()
-    out = StringIO()
+    out = BytesIO()
     flatten(None, root, out.write)
 
 
