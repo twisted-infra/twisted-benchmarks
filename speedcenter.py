@@ -63,7 +63,7 @@ def reportEnvironment():
         'environment': uname()[1].split('.')[0],
         'commitid': nativeString(revision),
         'branch': 'default',
-        'revision_date': nativeString(date),
+        'revision_date': " ".join(nativeString(date).split(" ")[0:2]),
         'result_date': str(datetime.now())[0:-7],
     }
     print(resp)
