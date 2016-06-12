@@ -53,7 +53,7 @@ class SpeedcenterDriver(Driver):
 
 
 def reportEnvironment():
-    lines = subprocess.check_output(["git", "show", "-q", '--format="%H,%ai"']).split(b"\n")
+    lines = subprocess.check_output(["git", "show", "-q", '--format=%H,%ai']).split(b"\n")
     revision, date = lines[0].split(b",")
     exec_trimmed = path.basename(executable)
 
