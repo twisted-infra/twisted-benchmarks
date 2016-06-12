@@ -8,6 +8,7 @@ from __future__ import division, print_function
 import subprocess
 import json
 import requests
+import sys
 
 from sys import argv, stdout
 from os import uname, path
@@ -112,8 +113,9 @@ def main():
             return
         tries = tries + 1
         print("Try #{}".format(tries))
-    print(r.content)
 
+    print(r.content)
+    sys.exit(1)
 
 if __name__ == '__main__':
     main()
