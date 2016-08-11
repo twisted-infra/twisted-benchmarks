@@ -12,9 +12,9 @@ from benchlib import Client, driver
 
 class Benchmark(Command):
     arguments = [
-        ('foo', String()),
-        ('bar', Integer()),
-        ('baz', ListOf(Float())),
+        (b'foo', String()),
+        (b'bar', Integer()),
+        (b'baz', ListOf(Float())),
         ]
 
 
@@ -27,7 +27,7 @@ class BenchmarkLocator(CommandLocator):
 
 
 class Client(Client):
-    _string = 'hello, world' * 50
+    _string = b'hello, world' * 50
     _integer = 123454321
     _list = [1.2, 2.3, 3.4]
 
