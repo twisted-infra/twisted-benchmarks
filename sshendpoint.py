@@ -1,7 +1,7 @@
 
 import sys, os
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from twisted.python.failure import Failure
 from twisted.python.log import err
@@ -59,7 +59,7 @@ class _CommandConnection(SSHConnection):
 
 
 class _CommandChannel(SSHChannel):
-    name = 'session'
+    name = b'session'
     _protocol = None
 
     def __init__(self, command, protocolFactory, commandConnected):
@@ -75,7 +75,7 @@ class _CommandChannel(SSHChannel):
 
     def channelOpen(self, ignored):
         d = self.conn.sendRequest(
-            self, 'exec', NS(self._command), wantReply=True)
+            self, b'exec', NS(self._command), wantReply=True)
         def execed(ignored):
             self._protocol = self._protocolFactory.buildProtocol(None)
             self._protocol.makeConnection(self)
@@ -101,8 +101,8 @@ class _CommandChannel(SSHChannel):
 
 
 
+@implementer(IStreamClientEndpoint)
 class SSHCommandClientEndpoint(object):
-    implements(IStreamClientEndpoint)
 
     def __init__(self, command, sshServer, authFactory=None):
         if authFactory is None:

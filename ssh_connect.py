@@ -15,11 +15,11 @@ from benchlib import Client, driver
 
 
 PUBLIC_KEY = (
-    'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPrJ3/c9k2I/Az6'
-    '4fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTwTTYLh5KmRpslkYHRivcJSkb'
-    'h/C+BR3utDS555mV')
+    b'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPrJ3/c9k2I/Az6'
+    b'4fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTwTTYLh5KmRpslkYHRivcJSkb'
+    b'h/C+BR3utDS555mV')
 
-PRIVATE_KEY = """-----BEGIN RSA PRIVATE KEY-----
+PRIVATE_KEY = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIByAIBAAJhAK8ycfDmDpyZs3+LXwRLy4vA1T6yd/3PZNiPwM+uH8Yx3/YpskSW
 4sbUIZR/ZXzY1CMfuC5qyR+UDUbBaaK3Bwyjk8E02C4eSpkabJZGB0Yr3CUpG4fw
 vgUd7rQ0ueeZlQIBIwJgbh+1VZfr7WftK5lu7MHtqE1S1vPWZQYE3+VUn8yJADyb
@@ -61,11 +61,11 @@ class Client(Client):
 
 class BenchmarkSSHFactory(SSHFactory):
     publicKeys = {
-        'ssh-rsa': Key.fromString(data=PUBLIC_KEY),
-        }
+        b'ssh-rsa': Key.fromString(data=PUBLIC_KEY),
+    }
     privateKeys = {
-        'ssh-rsa': Key.fromString(data=PRIVATE_KEY),
-        }
+        b'ssh-rsa': Key.fromString(data=PRIVATE_KEY),
+    }
 
 
 def main(reactor, duration):

@@ -1,5 +1,5 @@
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from twisted.internet.defer import succeed
 from twisted.internet.endpoints import TCP4ClientEndpoint
@@ -48,17 +48,16 @@ class EchoTransport(object):
         pass
 
 
-
+@implementer(ISession)
 class BenchmarkAvatar(ConchUser):
-    implements(ISession)
 
     def __init__(self):
         ConchUser.__init__(self)
-        self.channelLookup['session'] = SSHSession
+        self.channelLookup[b'session'] = SSHSession
 
 
     def execCommand(self, proto, cmd):
-        if cmd == 'chargen':
+        if cmd == b'chargen':
             self.proto = proto
             transport = EchoTransport(proto)
             proto.makeConnection(transport)
@@ -70,9 +69,8 @@ class BenchmarkAvatar(ConchUser):
         pass
 
 
-
+@implementer(IRealm)
 class BenchmarkRealm(object):
-    implements(IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
         return (
@@ -86,15 +84,18 @@ def main(reactor, duration):
 
     server = BenchmarkSSHFactory()
     server.portal = Portal(BenchmarkRealm())
-    server.portal.registerChecker(
-        InMemoryUsernamePasswordDatabaseDontUse(username='password'))
+
+    checker = InMemoryUsernamePasswordDatabaseDontUse()
+    checker.users = {b"username": b"password"}
+
+    server.portal.registerChecker(checker)
 
     port = reactor.listenTCP(0, server)
     tcpServer = TCP4ClientEndpoint(reactor, '127.0.0.1', port.getHost().port)
     sshServer = SSHCommandClientEndpoint(
-        'chargen', tcpServer,
+        b'chargen', tcpServer,
         lambda command:
-            SSHPasswordUserAuth('username', 'password', command))
+            SSHPasswordUserAuth(b'username', b'password', command))
 
     client = Client(reactor, sshServer)
     d = client.run(duration, chunkSize)
