@@ -3,6 +3,11 @@
 Benchmark for Twisted Spread.
 """
 
+from twisted.python.compat import _PY3
+
+if _PY3:
+    raise ImportError("Doesn't work on Py3 yet")
+
 from twisted.spread.pb import PBServerFactory, PBClientFactory, Root
 
 from benchlib import Client, driver
