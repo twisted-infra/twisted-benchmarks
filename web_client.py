@@ -11,14 +11,10 @@ performance and makes consecutive runs of the benchmark vary wildly in their
 results.
 """
 
-from twisted.internet.protocol import Protocol
+from twisted.internet.protocol import Protocol, Factory
 from twisted.internet.defer import Deferred
-from twisted.web.server import Site
-from twisted.web.static import Data
-from twisted.web.resource import Resource
 from twisted.web.client import Agent
 from twisted.python.compat import networkString
-
 from twisted.web.client import ResponseDone
 
 from benchlib import Client, driver
@@ -27,6 +23,7 @@ from benchlib import Client, driver
 class BodyConsumer(Protocol):
     def __init__(self, finished):
         self.finished = finished
+
 
     def connectionLost(self, reason):
         if reason.check(ResponseDone):
@@ -56,19 +53,41 @@ class Client(Client):
         return finished
 
 
+class FakeServerProtocol(Protocol):
+
+    def __init__(self):
+        self._data = b""
+
+
+    def dataReceived(self, data):
+        self._data += data
+
+        if self._data[-4:] == b"\r\n\r\n":
+            self.transport.write(self.factory.response)
+
+        self.transport.loseConnection()
+
+
 
 interface = 0
 def main(reactor, duration):
     global interface
     concurrency = 10
 
-    root = Resource()
-    root.putChild(b'', Data(b"Hello, world", "text/plain"))
+    protoFactory = Factory.forProtocol(FakeServerProtocol)
+    protoFactory.response = b"\r\n".join(b"""HTTP/1.1 200 OK
+Date: Sat, 31 Dec 2016 07:48:22 GMT
+Connection: close
+Content-Type: text/plain
+Content-Length: 12
+Server: FakeTwistedWeb
+
+Hello, world""".split(b"\n"))
 
     interface += 1
     interface %= 255
     port = reactor.listenTCP(
-        0, Site(root), backlog=128, interface='127.0.0.%d' % (interface,))
+        0, protoFactory, backlog=128, interface='127.0.0.%d' % (interface,))
     agent = Agent(reactor)
     client = Client(reactor, port.getHost().host, port.getHost().port, agent)
     d = client.run(concurrency, duration)
@@ -83,5 +102,5 @@ def main(reactor, duration):
 
 if __name__ == '__main__':
     import sys
-    import web
-    driver(web.main, sys.argv)
+    import web_client
+    driver(web_client.main, sys.argv)
