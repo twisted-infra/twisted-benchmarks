@@ -11,13 +11,12 @@ performance and makes consecutive runs of the benchmark vary wildly in their
 results.
 """
 
-from twisted.internet.protocol import Protocol, Factory
+from twisted.internet.protocol import Factory
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.defer import Deferred
 from twisted.web.server import Site
 from twisted.web.static import Data
 from twisted.web.resource import Resource
-from twisted.python.compat import networkString
 from twisted.test.proto_helpers import AccumulatingProtocol
 
 from benchlib import Client, driver
