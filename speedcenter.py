@@ -62,7 +62,7 @@ def reportEnvironment():
         'executable': exec_trimmed,
         'environment': uname()[1].split('.')[0],
         'commitid': nativeString(revision),
-        'branch': 'default',
+        'branch': 'trunk',
         'revision_date': " ".join(nativeString(date).split(" ")[0:2]),
         'result_date': str(datetime.now())[0:-7],
     }
