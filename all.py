@@ -10,7 +10,8 @@ allBenchmarkNames = [
     "deferred_callback_chains", "deferred_await", "deferred_yieldfrom",
     "linereceiver", "lineonlyreceiver", "int16receiver",
 
-    "tcp_connect", "ssh_connect", "ssl_connect", "sslbio_connect",
+    "tcp_connect", "ssh_connect",
+    "ssl_connect", "ssl_connect_contextfactory", "sslbio_connect",
     "tcp_throughput", "ssh_throughput", "ssl_throughput", "sslbio_throughput",
     ]
 
