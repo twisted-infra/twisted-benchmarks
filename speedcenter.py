@@ -4,15 +4,14 @@ Evaluate one or more benchmarks and upload the results to a Speedcenter server.
 
 from __future__ import division, print_function
 
-import subprocess
 import json
-import requests
+import subprocess
 import sys
-
-from sys import argv, stdout
-from os import uname, path
-from sys import executable
 from datetime import datetime
+from os import path, uname
+from sys import argv, executable, stdout
+
+import requests
 
 from twisted.python.compat import nativeString
 from twisted.python.usage import UsageError

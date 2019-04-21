@@ -3,15 +3,14 @@ Benchmark for SSH connection setup between a Conch client and server using RSA
 keys.
 """
 
-from twisted.internet.defer import Deferred, succeed
-from twisted.internet.endpoints import TCP4ClientEndpoint
-from twisted.internet.protocol import Factory
 from twisted.conch.ssh.factory import SSHFactory
 from twisted.conch.ssh.keys import Key
 from twisted.conch.ssh.transport import SSHClientTransport
+from twisted.internet.defer import Deferred, succeed
+from twisted.internet.endpoints import TCP4ClientEndpoint
+from twisted.internet.protocol import Factory
 
 from benchlib import Client, driver
-
 
 PUBLIC_KEY = (
     b'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPrJ3/c9k2I/Az6'

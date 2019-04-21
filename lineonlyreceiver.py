@@ -1,7 +1,7 @@
+from _protocol import makeMain
+
 from twisted.protocols.basic import LineOnlyReceiver
 from twisted.test.proto_helpers import StringTransport
-
-from _protocol import makeMain
 
 
 class LineOnlyReceiver(LineOnlyReceiver):

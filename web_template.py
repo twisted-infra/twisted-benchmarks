@@ -8,11 +8,11 @@ from twisted.internet.defer import succeed
 from twisted.python.compat import xrange
 from twisted.web.template import (
     Element,
+    TagLoader,
+    XMLString,
     flatten,
     renderer,
-    TagLoader,
     tags,
-    XMLString,
 )
 
 from benchlib import driver

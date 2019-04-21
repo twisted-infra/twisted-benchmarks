@@ -1,6 +1,7 @@
+from time import time
+
 from twisted.internet import defer, task
 
-from time import time
 from benchlib import driver
 
 

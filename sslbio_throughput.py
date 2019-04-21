@@ -1,7 +1,7 @@
-from benchlib import driver
-
 from ssl_throughput import main as _main
 from sslbio_connect import SSLBIOReactor
+
+from benchlib import driver
 
 
 def main(reactor, duration):

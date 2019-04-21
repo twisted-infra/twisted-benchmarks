@@ -1,7 +1,7 @@
 from time import time
 
-from twisted.internet.protocol import ServerFactory, Factory, Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint
+from twisted.internet.protocol import Factory, Protocol, ServerFactory
 
 from benchlib import Client, driver
 

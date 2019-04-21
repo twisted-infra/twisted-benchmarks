@@ -2,10 +2,10 @@ from __future__ import division, print_function
 
 import sys
 
-from twisted.python import log
+from twisted.application.app import ReactorSelectionMixin
 from twisted.internet.defer import Deferred
 from twisted.internet.task import cooperate
-from twisted.application.app import ReactorSelectionMixin
+from twisted.python import log
 from twisted.python.usage import Options
 
 

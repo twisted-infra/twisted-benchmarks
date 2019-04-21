@@ -8,7 +8,7 @@ factor in the performance of this benchmark.
 
 from twisted.internet.defer import Deferred
 from twisted.internet.endpoints import TCP4ClientEndpoint
-from twisted.internet.protocol import ServerFactory, Factory, Protocol
+from twisted.internet.protocol import Factory, Protocol, ServerFactory
 from twisted.protocols.wire import Echo
 
 from benchlib import driver

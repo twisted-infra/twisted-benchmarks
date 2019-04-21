@@ -4,13 +4,14 @@ CertificateOptions repeatedly.
 """
 
 from time import time
-from benchlib import driver
-
-from twisted.internet.protocol import Factory, Protocol
-from twisted.internet.endpoints import SSL4ServerEndpoint, SSL4ClientEndpoint
 
 from ssl_throughput import cert
-from tcp_connect import CloseConnection, Client
+from tcp_connect import Client, CloseConnection
+
+from twisted.internet.endpoints import SSL4ClientEndpoint, SSL4ServerEndpoint
+from twisted.internet.protocol import Factory, Protocol
+
+from benchlib import driver
 
 
 class WriteOneByte(Protocol):

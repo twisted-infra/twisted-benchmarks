@@ -1,5 +1,6 @@
-from twisted.protocols.basic import LineReceiver
 from _protocol import makeMain
+
+from twisted.protocols.basic import LineReceiver
 
 
 class LineReceiver(LineReceiver):

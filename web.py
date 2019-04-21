@@ -10,15 +10,13 @@ performance and makes consecutive runs of the benchmark vary wildly in their
 results.
 """
 
-from twisted.internet.protocol import Protocol
 from twisted.internet.defer import Deferred
+from twisted.internet.protocol import Protocol
+from twisted.python.compat import networkString
+from twisted.web.client import Agent, ResponseDone
+from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.static import Data
-from twisted.web.resource import Resource
-from twisted.web.client import Agent
-from twisted.python.compat import networkString
-
-from twisted.web.client import ResponseDone
 
 from benchlib import Client, driver
 

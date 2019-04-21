@@ -1,17 +1,15 @@
+from ssh_connect import BenchmarkSSHFactory
+from sshendpoint import SSHCommandClientEndpoint
+from tcp_throughput import Client
 from zope.interface import implementer
 
+from twisted.conch.avatar import ConchUser
+from twisted.conch.ssh.session import ISession, SSHSession
+from twisted.conch.ssh.userauth import SSHUserAuthClient
+from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse
+from twisted.cred.portal import IRealm, Portal
 from twisted.internet.defer import succeed
 from twisted.internet.endpoints import TCP4ClientEndpoint
-from twisted.cred.portal import IRealm, Portal
-from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse
-from twisted.conch.avatar import ConchUser
-from twisted.conch.ssh.userauth import SSHUserAuthClient
-from twisted.conch.ssh.session import ISession, SSHSession
-
-from ssh_connect import BenchmarkSSHFactory
-from tcp_throughput import Client
-
-from sshendpoint import SSHCommandClientEndpoint
 
 from benchlib import driver
 

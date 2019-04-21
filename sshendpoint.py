@@ -1,20 +1,20 @@
-import sys, os
+import os
+import sys
 
 from zope.interface import implementer
 
-from twisted.python.failure import Failure
-from twisted.python.log import err
-from twisted.internet.error import ConnectionDone
-from twisted.internet.defer import Deferred, succeed
-from twisted.internet.interfaces import IStreamClientEndpoint
-from twisted.internet.protocol import Factory, Protocol
-
-from twisted.conch.ssh.common import NS
-from twisted.conch.ssh.channel import SSHChannel
-from twisted.conch.ssh.transport import SSHClientTransport
-from twisted.conch.ssh.connection import SSHConnection
 from twisted.conch.client.default import SSHUserAuthClient
 from twisted.conch.client.options import ConchOptions
+from twisted.conch.ssh.channel import SSHChannel
+from twisted.conch.ssh.common import NS
+from twisted.conch.ssh.connection import SSHConnection
+from twisted.conch.ssh.transport import SSHClientTransport
+from twisted.internet.defer import Deferred, succeed
+from twisted.internet.error import ConnectionDone
+from twisted.internet.interfaces import IStreamClientEndpoint
+from twisted.internet.protocol import Factory, Protocol
+from twisted.python.failure import Failure
+from twisted.python.log import err
 
 # setDebugging(True)
 

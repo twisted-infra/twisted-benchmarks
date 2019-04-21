@@ -4,17 +4,17 @@ with a 2048 bit RSA key as well as a client which pumps as much data to that
 server as it can in a fixed period of time.
 """
 
-from twisted.internet.protocol import ServerFactory
+from tcp_throughput import Client, driver
+
 from twisted.internet.endpoints import SSL4ClientEndpoint
+from twisted.internet.protocol import ServerFactory
 from twisted.internet.ssl import (
     DN,
+    CertificateOptions,
     KeyPair,
     PrivateCertificate,
-    CertificateOptions,
 )
 from twisted.protocols.wire import Echo
-
-from tcp_throughput import Client, driver
 
 # Generate a new self-signed certificate
 key = KeyPair.generate(size=2048)

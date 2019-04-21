@@ -1,6 +1,8 @@
 import struct
-from twisted.protocols.basic import Int16StringReceiver
+
 from _protocol import makeMain
+
+from twisted.protocols.basic import Int16StringReceiver
 
 
 class Int16StringReceiver(Int16StringReceiver):

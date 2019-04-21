@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-
 from twisted.python.reflect import namedAny
 
 from benchlib import multidriver

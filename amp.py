@@ -2,9 +2,16 @@
 Benchmark for Twisted's (A)synchronous (M)essaging (P)rotocol.
 """
 
-from twisted.internet.protocol import ServerFactory, ClientCreator
-from twisted.protocols.amp import String, Integer, Float, ListOf
-from twisted.protocols.amp import Command, CommandLocator, AMP
+from twisted.internet.protocol import ClientCreator, ServerFactory
+from twisted.protocols.amp import (
+    AMP,
+    Command,
+    CommandLocator,
+    Float,
+    Integer,
+    ListOf,
+    String,
+)
 
 from benchlib import Client, driver
 
