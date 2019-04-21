@@ -21,7 +21,7 @@ class Client(Client):
             p = self._protocol()
             i = 0
             while i < len(s):
-                p.dataReceived(s[i:i+chunkSize])
+                p.dataReceived(s[i : i + chunkSize])
                 i += chunkSize
             self._bytes += chunkSize
         self._reactor.callLater(0.0, self._continue, None)
