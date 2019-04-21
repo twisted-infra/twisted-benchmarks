@@ -8,22 +8,21 @@ from twisted.spread.pb import PBClientFactory, PBServerFactory, Root
 from benchlib import Client, driver
 
 
-_structure = [
-    b'hello' * 100,
-    {
-        b'bytestring key': b'val',
-        'nativestr': 100,
-        u'these are bytes': (1, 2, 3),
-    },
-]
-
-
 class BenchRoot(Root):
     def remote_discard(self, argument):
-        assert argument == _structure
+        pass
 
 
 class Client(Client):
+    self._structure = [
+        b'hello' * 100,
+        {
+            b'bytestring key': b'val',
+            'nativestr': 100,
+            u'these are bytes': (1, 2, 3),
+        },
+    ]
+
     def __init__(self, reactor, port):
         super(Client, self).__init__(reactor)
         self._port = port
@@ -43,7 +42,7 @@ class Client(Client):
         self._reference.broker.transport.loseConnection()
 
     def _request(self):
-        d = self._reference.callRemote('discard', _structure)
+        d = self._reference.callRemote('discard', self._structure)
         d.addCallback(self._continue)
         d.addErrback(self._stop)
 
