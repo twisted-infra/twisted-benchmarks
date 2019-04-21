@@ -21,4 +21,5 @@ def main(reactor, duration):
 if __name__ == '__main__':
     import sys
     import deferred_yieldfrom
+
     driver(deferred_yieldfrom.main, sys.argv)

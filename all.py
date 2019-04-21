@@ -6,14 +6,29 @@ from twisted.python.reflect import namedAny
 from benchlib import multidriver
 
 allBenchmarkNames = [
-    "iteration", "names", "threads", "web", "web_template", "pb", "amp",
-    "deferred_callback_chains", "deferred_await", "deferred_yieldfrom",
-    "linereceiver", "lineonlyreceiver", "int16receiver",
-
-    "tcp_connect", "ssh_connect",
-    "ssl_connect", "ssl_connect_contextfactory", "sslbio_connect",
-    "tcp_throughput", "ssh_throughput", "ssl_throughput", "sslbio_throughput",
-    ]
+    "iteration",
+    "names",
+    "threads",
+    "web",
+    "web_template",
+    "pb",
+    "amp",
+    "deferred_callback_chains",
+    "deferred_await",
+    "deferred_yieldfrom",
+    "linereceiver",
+    "lineonlyreceiver",
+    "int16receiver",
+    "tcp_connect",
+    "ssh_connect",
+    "ssl_connect",
+    "ssl_connect_contextfactory",
+    "sslbio_connect",
+    "tcp_throughput",
+    "ssh_throughput",
+    "ssl_throughput",
+    "sslbio_throughput",
+]
 
 allBenchmarks = []
 

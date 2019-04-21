@@ -18,7 +18,6 @@ class WriteOneByte(Protocol):
         self.transport.write(b"x")
 
 
-
 class Client(Client):
     protocol = WriteOneByte
 
@@ -39,21 +38,30 @@ def main(reactor, duration):
     factory = Factory()
     factory.protocol = CloseConnection
     serverEndpoint = SSL4ServerEndpoint(
-        reactor, 0, cert.options(), interface=interface)
+        reactor, 0, cert.options(), interface=interface
+    )
 
     listen = serverEndpoint.listen(factory)
+
     def cbListening(port):
         server = lambda: SSL4ClientEndpoint(
-            reactor, interface, port.getHost().port,
-            cert.options(), bindAddress=(interface, 0))
+            reactor,
+            interface,
+            port.getHost().port,
+            cert.options(),
+            bindAddress=(interface, 0),
+        )
         client = Client(reactor, server)
         d = client.run(concurrency, duration)
+
         def cleanup(passthrough):
             d = port.stopListening()
             d.addCallback(lambda ignored: passthrough)
             return d
+
         d.addCallback(cleanup)
         return d
+
     listen.addCallback(cbListening)
     return listen
 
@@ -61,4 +69,5 @@ def main(reactor, duration):
 if __name__ == '__main__':
     import sys
     import ssl_connect_contextfactory
+
     driver(ssl_connect_contextfactory.main, sys.argv)

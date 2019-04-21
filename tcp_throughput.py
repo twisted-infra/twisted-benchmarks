@@ -1,4 +1,3 @@
-
 """
 This benchmarks runs a trivial Twisted TCP echo server and a client pumps as
 much data to it as it can in a fixed period of time.
@@ -22,14 +21,12 @@ class Counter(Protocol):
         self.count += len(b)
 
 
-
 class Client(object):
     _finished = None
 
     def __init__(self, reactor, server):
         self._reactor = reactor
         self._server = server
-
 
     def run(self, duration, chunkSize):
         self._duration = duration
@@ -41,10 +38,8 @@ class Client(object):
         d.addCallback(self._connected)
         return d
 
-
     def cleanup(self):
         self._client.transport.loseConnection()
-
 
     def _connected(self, client):
         self._client = client
@@ -53,12 +48,10 @@ class Client(object):
         self._finished = Deferred()
         return self._finished
 
-
     def _stop(self):
         self.stopProducing()
         self._client.transport.unregisterProducer()
         self._finish(self._client.count)
-
 
     def _finish(self, value):
         if self._finished is not None:
@@ -66,18 +59,14 @@ class Client(object):
             self._finished = None
             finished.callback(value)
 
-
     def resumeProducing(self):
         self._client.transport.write(self._bytes)
-
 
     def stopProducing(self):
         self.cleanup()
 
-
     def connectionLost(self, reason):
         self._finish(reason)
-
 
 
 def main(reactor, duration):
@@ -87,14 +76,15 @@ def main(reactor, duration):
     server.protocol = Echo
     port = reactor.listenTCP(0, server)
     client = Client(
-        reactor,
-        TCP4ClientEndpoint(
-            reactor, '127.0.0.1', port.getHost().port))
+        reactor, TCP4ClientEndpoint(reactor, '127.0.0.1', port.getHost().port)
+    )
     d = client.run(duration, chunkSize)
+
     def cleanup(passthrough):
         d = port.stopListening()
         d.addCallback(lambda ignored: passthrough)
         return d
+
     d.addCallback(cleanup)
     return d
 
@@ -102,4 +92,5 @@ def main(reactor, duration):
 if __name__ == '__main__':
     import sys
     import tcp_throughput
+
     driver(tcp_throughput.main, sys.argv)

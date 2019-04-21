@@ -10,12 +10,13 @@ class LineOnlyReceiver(LineOnlyReceiver):
     def lineReceived(self, line):
         pass
 
-main = makeMain(LineOnlyReceiver,
-                ((b"a" * 50) + b"\r\n") * 1000)
+
+main = makeMain(LineOnlyReceiver, ((b"a" * 50) + b"\r\n") * 1000)
 main.__module__ = "only-lines"
 
 if __name__ == '__main__':
     import sys
     import lineonlyreceiver
     from benchlib import driver
+
     driver(lineonlyreceiver.main, sys.argv)

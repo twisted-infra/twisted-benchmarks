@@ -1,4 +1,3 @@
-
 """
 This benchmark runs a trivial Twisted Web server and client and makes as many
 requests as it can in a fixed period of time.
@@ -35,13 +34,13 @@ class BodyConsumer(Protocol):
             self.finished.errback(reason)
 
 
-
 class Client(Client):
     def __init__(self, reactor, host, portNumber, agent):
-        self._requestLocation = networkString('http://%s:%d/' % (host, portNumber,))
+        self._requestLocation = networkString(
+            'http://%s:%d/' % (host, portNumber)
+        )
         self._agent = agent
         super(Client, self).__init__(reactor)
-
 
     def _request(self):
         d = self._agent.request(b'GET', self._requestLocation)
@@ -49,15 +48,15 @@ class Client(Client):
         d.addCallback(self._continue)
         d.addErrback(self._stop)
 
-
     def _read(self, response):
         finished = Deferred()
         response.deliverBody(BodyConsumer(finished))
         return finished
 
 
-
 interface = 0
+
+
 def main(reactor, duration):
     global interface
     concurrency = 10
@@ -68,20 +67,23 @@ def main(reactor, duration):
     interface += 1
     interface %= 255
     port = reactor.listenTCP(
-        0, Site(root), backlog=128, interface='127.0.0.%d' % (interface,))
+        0, Site(root), backlog=128, interface='127.0.0.%d' % (interface,)
+    )
     agent = Agent(reactor)
     client = Client(reactor, port.getHost().host, port.getHost().port, agent)
     d = client.run(concurrency, duration)
+
     def cleanup(passthrough):
         d = port.stopListening()
         d.addCallback(lambda ignored: passthrough)
         return d
+
     d.addBoth(cleanup)
     return d
-
 
 
 if __name__ == '__main__':
     import sys
     import web
+
     driver(web.main, sys.argv)

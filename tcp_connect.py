@@ -1,4 +1,3 @@
-
 from time import time
 
 from twisted.internet.protocol import ServerFactory, Factory, Protocol
@@ -12,14 +11,12 @@ class CloseConnection(Protocol):
         transport.loseConnection()
 
 
-
 class Client(Client):
     protocol = CloseConnection
 
     def __init__(self, reactor, server):
         super(Client, self).__init__(reactor)
         self._server = server
-
 
     def _request(self):
         factory = Factory()
@@ -28,7 +25,6 @@ class Client(Client):
         d = self._server.connect(factory)
         d.addCallback(self._continue)
         d.addErrback(self._stop)
-
 
 
 def main(reactor, duration):
@@ -41,20 +37,27 @@ def main(reactor, duration):
     port = reactor.listenTCP(0, factory, interface=interface)
 
     client = Client(
-        reactor, TCP4ClientEndpoint(
-            reactor, port.getHost().host, port.getHost().port,
-            bindAddress=(interface, 0)))
+        reactor,
+        TCP4ClientEndpoint(
+            reactor,
+            port.getHost().host,
+            port.getHost().port,
+            bindAddress=(interface, 0),
+        ),
+    )
     d = client.run(concurrency, duration)
+
     def cleanup(passthrough):
         d = port.stopListening()
         d.addCallback(lambda ignored: passthrough)
         return d
+
     d.addCallback(cleanup)
     return d
-
 
 
 if __name__ == '__main__':
     import sys
     import tcp_connect
+
     driver(tcp_connect.main, sys.argv)

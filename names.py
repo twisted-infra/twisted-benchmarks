@@ -1,4 +1,3 @@
-
 from twisted.names.dns import DNSDatagramProtocol
 from twisted.names.server import DNSServerFactory
 from twisted.names import hosts, client
@@ -12,14 +11,10 @@ class Client(Client):
         self._timeout = timeout
         super(Client, self).__init__(reactor)
 
-
     def _request(self):
-        d = self._resolver.lookupAddress(
-            'localhost', timeout=(self._timeout,))
+        d = self._resolver.lookupAddress('localhost', timeout=(self._timeout,))
         d.addCallback(self._continue)
         d.addErrback(self._stop)
-
-
 
 
 def main(reactor, duration):
@@ -31,10 +26,12 @@ def main(reactor, duration):
     # we don't have to deal with retries or timeout errors.
     client = Client(reactor, port.getHost().port, duration)
     d = client.run(concurrency, duration)
+
     def cleanup(passthrough):
         d = port.stopListening()
         d.addCallback(lambda ign: passthrough)
         return d
+
     d.addBoth(cleanup)
     return d
 
@@ -42,4 +39,5 @@ def main(reactor, duration):
 if __name__ == '__main__':
     import sys
     import names
+
     driver(names.main, sys.argv)

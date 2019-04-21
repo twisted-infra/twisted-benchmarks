@@ -1,4 +1,3 @@
-
 """
 Benchmark for SSH connection setup between a Conch client and server using RSA
 keys.
@@ -17,7 +16,8 @@ from benchlib import Client, driver
 PUBLIC_KEY = (
     b'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPrJ3/c9k2I/Az6'
     b'4fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTwTTYLh5KmRpslkYHRivcJSkb'
-    b'h/C+BR3utDS555mV')
+    b'h/C+BR3utDS555mV'
+)
 
 PRIVATE_KEY = b"""-----BEGIN RSA PRIVATE KEY-----
 MIIByAIBAAJhAK8ycfDmDpyZs3+LXwRLy4vA1T6yd/3PZNiPwM+uH8Yx3/YpskSW
@@ -37,18 +37,15 @@ class SimpleTransport(SSHClientTransport):
     def verifyHostKey(self, hostKey, fingerprint):
         return succeed(True)
 
-
     def connectionSecure(self):
         self.transport.loseConnection()
         self.factory.finished.callback(None)
-
 
 
 class Client(Client):
     def __init__(self, reactor, server):
         super(Client, self).__init__(reactor)
         self._server = server
-
 
     def _request(self):
         client = Factory()
@@ -60,31 +57,29 @@ class Client(Client):
 
 
 class BenchmarkSSHFactory(SSHFactory):
-    publicKeys = {
-        b'ssh-rsa': Key.fromString(data=PUBLIC_KEY),
-    }
-    privateKeys = {
-        b'ssh-rsa': Key.fromString(data=PRIVATE_KEY),
-    }
+    publicKeys = {b'ssh-rsa': Key.fromString(data=PUBLIC_KEY)}
+    privateKeys = {b'ssh-rsa': Key.fromString(data=PRIVATE_KEY)}
 
 
 def main(reactor, duration):
     server = BenchmarkSSHFactory()
     port = reactor.listenTCP(0, server)
     client = Client(
-        reactor,
-        TCP4ClientEndpoint(reactor, '127.0.0.1', port.getHost().port))
+        reactor, TCP4ClientEndpoint(reactor, '127.0.0.1', port.getHost().port)
+    )
     d = client.run(1, duration)
+
     def cleanup(passthrough):
         d = port.stopListening()
         d.addCallback(lambda ignored: passthrough)
         return d
+
     d.addCallback(cleanup)
     return d
-
 
 
 if __name__ == '__main__':
     import sys
     import ssh_connect
+
     driver(ssh_connect.main, sys.argv)

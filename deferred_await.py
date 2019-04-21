@@ -21,4 +21,5 @@ def main(reactor, duration):
 if __name__ == '__main__':
     import sys
     import deferred_await
+
     driver(deferred_await.main, sys.argv)
