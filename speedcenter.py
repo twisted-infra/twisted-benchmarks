@@ -1,19 +1,17 @@
-
 """
 Evaluate one or more benchmarks and upload the results to a Speedcenter server.
 """
 
 from __future__ import division, print_function
 
-import subprocess
 import json
-import requests
+import subprocess
 import sys
-
-from sys import argv, stdout
-from os import uname, path
-from sys import executable
 from datetime import datetime
+from os import path, uname
+from sys import argv, executable, stdout
+
+import requests
 
 from twisted.python.compat import nativeString
 from twisted.python.usage import UsageError
@@ -30,18 +28,22 @@ SPEEDCENTER_NAMES = {
     'ssl_throughput': 'SSL Throughput',
     'sslbio_connect': 'SSL (Memory BIO) Connections',
     'sslbio_throughput': 'SSL (Memory BIO) Throughput',
-    }
+}
 
 
 class SpeedcenterOptions(BenchmarkOptions):
     optParameters = [
-        ('url', None, None, 'Location of Speedcenter to which to upload results.'),
-        ]
+        (
+            'url',
+            None,
+            None,
+            'Location of Speedcenter to which to upload results.',
+        )
+    ]
 
     def postOptions(self):
         if not self['url']:
             raise UsageError("The Speedcenter URL must be provided.")
-
 
 
 class SpeedcenterDriver(Driver):
@@ -51,9 +53,10 @@ class SpeedcenterDriver(Driver):
         self.results.setdefault(name, []).append((acceptCount, duration))
 
 
-
 def reportEnvironment():
-    lines = subprocess.check_output(["git", "show", "-q", '--format=%H,%ai']).split(b"\n")
+    lines = subprocess.check_output(
+        ["git", "show", "-q", '--format=%H,%ai']
+    ).split(b"\n")
     revision, date = lines[0].split(b",")
     exec_trimmed = path.basename(executable)
 
@@ -68,7 +71,6 @@ def reportEnvironment():
     }
     print(resp)
     return resp
-
 
 
 def main():
@@ -86,7 +88,10 @@ def main():
     driver.results = {}
     driver.run_jobs(
         allBenchmarks,
-        options['duration'], options['iterations'], options['warmup'])
+        options['duration'],
+        options['iterations'],
+        options['warmup'],
+    )
 
     allStats = []
 
@@ -116,6 +121,7 @@ def main():
 
     print(r.content)
     sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

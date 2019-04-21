@@ -4,19 +4,19 @@ CertificateOptions repeatedly.
 """
 
 from time import time
-from benchlib import driver
-
-from twisted.internet.protocol import Factory, Protocol
-from twisted.internet.endpoints import SSL4ServerEndpoint, SSL4ClientEndpoint
 
 from ssl_throughput import cert
-from tcp_connect import CloseConnection, Client
+from tcp_connect import Client, CloseConnection
+
+from twisted.internet.endpoints import SSL4ClientEndpoint, SSL4ServerEndpoint
+from twisted.internet.protocol import Factory, Protocol
+
+from benchlib import driver
 
 
 class WriteOneByte(Protocol):
     def connectionMade(self):
         self.transport.write(b"x")
-
 
 
 class Client(Client):
@@ -39,21 +39,30 @@ def main(reactor, duration):
     factory = Factory()
     factory.protocol = CloseConnection
     serverEndpoint = SSL4ServerEndpoint(
-        reactor, 0, cert.options(), interface=interface)
+        reactor, 0, cert.options(), interface=interface
+    )
 
     listen = serverEndpoint.listen(factory)
+
     def cbListening(port):
         server = lambda: SSL4ClientEndpoint(
-            reactor, interface, port.getHost().port,
-            cert.options(), bindAddress=(interface, 0))
+            reactor,
+            interface,
+            port.getHost().port,
+            cert.options(),
+            bindAddress=(interface, 0),
+        )
         client = Client(reactor, server)
         d = client.run(concurrency, duration)
+
         def cleanup(passthrough):
             d = port.stopListening()
             d.addCallback(lambda ignored: passthrough)
             return d
+
         d.addCallback(cleanup)
         return d
+
     listen.addCallback(cbListening)
     return listen
 
@@ -61,4 +70,5 @@ def main(reactor, duration):
 if __name__ == '__main__':
     import sys
     import ssl_connect_contextfactory
+
     driver(ssl_connect_contextfactory.main, sys.argv)

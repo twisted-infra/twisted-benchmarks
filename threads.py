@@ -1,4 +1,3 @@
-
 from twisted.internet.threads import deferToThread
 
 from benchlib import Client, driver
@@ -11,7 +10,6 @@ class Client(Client):
         d.addErrback(self._stop)
 
 
-
 def main(reactor, duration):
     concurrency = 10
 
@@ -20,8 +18,8 @@ def main(reactor, duration):
     return d
 
 
-
 if __name__ == '__main__':
     import sys
     import threads
+
     driver(threads.main, sys.argv)
