@@ -5,26 +5,24 @@ Benchmark for Twisted Spread.
 
 from twisted.python.compat import _PY3
 
-if _PY3:
-    raise ImportError("Doesn't work on Py3 yet")
-
 from twisted.spread.pb import PBServerFactory, PBClientFactory, Root
 
 from benchlib import Client, driver
 
+_structure = [
+    b'hello' * 100,
+    {b'bytestring key': b'val',
+        'nativestr': 100,
+        u'these are bytes': (1, 2, 3)}
+]
 
 class BenchRoot(Root):
     def remote_discard(self, argument):
-        pass
-
+        assert argument == _structure
 
 
 class Client(Client):
-    _structure = [
-        'hello' * 100,
-        {'foo': 'bar',
-         'baz': 100,
-         u'these are bytes': (1, 2, 3)}]
+
 
     def __init__(self, reactor, port):
         super(Client, self).__init__(reactor)
@@ -47,7 +45,7 @@ class Client(Client):
 
 
     def _request(self):
-        d = self._reference.callRemote('discard', self._structure)
+        d = self._reference.callRemote('discard', _structure)
         d.addCallback(self._continue)
         d.addErrback(self._stop)
 
