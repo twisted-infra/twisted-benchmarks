@@ -7,11 +7,6 @@ from twisted.spread.pb import PBClientFactory, PBServerFactory, Root
 
 from benchlib import Client, driver
 
-if _PY3:
-    raise ImportError("Doesn't work on Py3 yet")
-
-
-
 
 class BenchRoot(Root):
     def remote_discard(self, argument):
@@ -19,9 +14,13 @@ class BenchRoot(Root):
 
 
 class Client(Client):
-    _structure = [
-        'hello' * 100,
-        {'foo': 'bar', 'baz': 100, u'these are bytes': (1, 2, 3)},
+    self._structure = [
+        b'hello' * 100,
+        {
+            b'bytestring key': b'val',
+            'nativestr': 100,
+            u'these are bytes': (1, 2, 3),
+        },
     ]
 
     def __init__(self, reactor, port):
