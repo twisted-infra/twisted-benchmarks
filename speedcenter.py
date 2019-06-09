@@ -7,6 +7,7 @@ from __future__ import division, print_function
 import json
 import subprocess
 import sys
+import platform
 from datetime import datetime
 from os import path, uname
 from sys import argv, executable, stdout
@@ -63,7 +64,7 @@ def reportEnvironment():
     resp = {
         'project': 'Twisted',
         'executable': exec_trimmed,
-        'environment': uname()[1].split('.')[0],
+        'environment': ' '.join(platform.dist()[:2]),
         'commitid': nativeString(revision),
         'branch': 'trunk',
         'revision_date': " ".join(nativeString(date).split(" ")[0:2]),
